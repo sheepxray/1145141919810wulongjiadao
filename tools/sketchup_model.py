@@ -184,8 +184,13 @@ model = Sketchup.active_model
 model.start_operation("Build Robot", true)
 
 # 清空旧模型（若重复运行）
+# ⚠️ 注意：这会删除当前模型里的所有内容。请在一个**新建的空模型**里运行。
 ents = model.active_entities
-ents.clear!
+if ents.count > 0
+  puts "提示: 当前模型非空（#{ents.count} 个实体），将清空后重建。"
+  puts "      若不想清空，请先新建一个空白模型。"
+  ents.clear!
+end
 
 # ---- 工具函数 ----------------------------------------------------------
 
@@ -214,13 +219,27 @@ def box_c(ents, name, cx, cy, cz, dx, dy, dz, color = nil)
 end
 
 # 圆柱（用于电机/轮子/立柱）
-# 实现要点：SketchUp 中圆柱 = 圆面 + pushpull(高度) + 平移到起点
+# 实现要点：
+#   1. 圆面画在 XY 平面（法线 +Z），pushpull 出高度
+#   2. 再按 axis 旋转 + 平移到目标位置
+# 兼容性注意：不同 SketchUp 版本的 add_circle 行为不同 ——
+#   有的会自动创建面，有的只创建边。这里两种情况都处理。
 def cyl(ents, name, cx, cy, cz, r, h, axis = :z, color = nil)
   grp = ents.add_group
   g = grp.entities
-  # 圆面始终画在 XY 平面（法线 +Z），再按需旋转移到位
+
   circle = g.add_circle([0, 0, 0], [0, 0, 1], r.mm, 24)
-  face = g.add_face(circle)
+
+  # add_circle 可能已自动建面；若没有则手动建
+  face = nil
+  g.each { |e| face = e if e.is_a?(Sketchup::Face) }
+  if face.nil?
+    face = g.add_face(circle)
+  end
+  if face.nil?
+    puts "警告: 无法创建圆柱面 (#{name})"
+    return grp
+  end
   face.pushpull(h.mm)
 
   # 按轴旋转并平移
