@@ -1,0 +1,74 @@
+# ---- 通用 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+*.log
+
+# ---- 编辑器 ----
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+
+# ---- 嵌入式 / 编译产物 ----
+build/
+Build/
+Debug/
+Release/
+*.o
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.su
+*.axf
+*.out
+*.a
+*.dep
+objects/
+listings/
+*.uvguix.*
+*.uvoptx.bak
+*.scvd
+
+# ---- PCB / EDA ----
+# 若团队用立创EDA / KiCad，取消下面注释按需忽略
+# *.kicad_pcb-bak
+# *-backups/
+# fp-info-cache
+# *.lck
+*.zip
+!docs/**/*.zip
+
+# ---- Python / 算法 ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+*.pt
+*.onnx
+*.pth
+*.h5
+.keras/
+runs/
+wandb/
+# 数据集不入库，用 DVC 或网盘；只保留标注脚本
+datasets/
+
+# ---- 机械 CAD 导出件 ----
+# 源文件（.step/.f3d/.sldprt）建议入库；大体积导出件忽略
+*.stl.bak
+*.3mf
+*.gcode
+*.bgcode
+
+# ---- 大文件 ----
+*.mp4
+*.mov
+*.avi
