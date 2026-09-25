@@ -100,7 +100,23 @@
 
 ## 在线文档站点
 
-本仓库的文档已做成静态站点，推送到 `main` 后由 GitHub Actions 自动构建部署：
+文档已做成静态站点，由 GitHub Actions 自动构建部署。
+
+> ### ⚠️ 首次启用需手动一步（当前阻塞）
+>
+> 站点代码与 workflow 都已就绪并推送，但**首次必须人工启用 Pages** ——
+> 这一步无法通过代码完成：
+>
+> **Settings → Pages → Source 选 `GitHub Actions`**
+>
+> 直接链接：https://github.com/sheepxray/1145141919810wulongjiadao/settings/pages
+>
+> 启用后重跑 workflow（或再 push 一次）即可。
+>
+> **当前状态**：首次 CI 运行中 `Build site` 与 `Verify internal links` **均已通过**，
+> 仅 `configure-pages` 因 Pages 未启用而失败 —— 启用后即可正常发布。
+
+启用后的访问地址：
 
 **https://sheepxray.github.io/1145141919810wulongjiadao/**
 
@@ -132,6 +148,8 @@ MkDocs Material 需要一长串依赖，在当前网络环境下安装耗时且�
 > ⚠️ 第二项是必要的：开发中曾出现「目录块覆盖了正文」的 bug，
 > 导致所有文档页**只剩目录、正文全空**，而链接检查**发现不了** ——
 > 链接全有效，页面却是空壳。所以必须显式验证正文存在。
+>
+> 两项检查在异常时都返回**非零退出码**，CI 中不会静默通过。
 
 ### 部署方式
 
@@ -140,9 +158,6 @@ MkDocs Material 需要一长串依赖，在当前网络环境下安装耗时且�
 | **A（推荐）** | GitHub Actions 自动部署 —— push 到 `main` 即触发 |
 | B | 手动推 gh-pages 分支：`git subtree push --prefix site origin gh-pages` |
 | C | 本地预览：`python tools/build_site.py --serve` |
-
-> **首次部署需在 GitHub 仓库设置里启用 Pages**：
-> Settings → Pages → Source 选 **GitHub Actions**。
 
 ## 工具（全部可运行，且都带自测）
 

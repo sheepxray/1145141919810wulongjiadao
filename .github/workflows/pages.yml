@@ -40,6 +40,11 @@ jobs:
         run: python tools/build_site.py --check
 
       - uses: actions/configure-pages@v5
+        with:
+          # 首次运行时尝试自动启用 Pages。
+          # ⚠️ 若仓库/组织策略不允许，这一步仍会失败 ——
+          #    那时需人工在 Settings → Pages → Source 选 "GitHub Actions"。
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
