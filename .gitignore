@@ -6,6 +6,10 @@ desktop.ini
 *.bak
 *.log
 
+# ---- GitHub Pages 构建产物 ----
+# site/ 由 tools/build_site.py 生成，CI 会重建，不入库
+site/
+
 # ---- 编辑器 ----
 .vscode/*
 !.vscode/settings.json

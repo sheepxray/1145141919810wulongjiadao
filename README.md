@@ -98,6 +98,52 @@
 | [hardware/](hardware/) | SketchUp 模型、接口定义 |
 | [firmware/](firmware/) | 主控与视觉端代码 |
 
+## 在线文档站点
+
+本仓库的文档已做成静态站点，推送到 `main` 后由 GitHub Actions 自动构建部署：
+
+**https://sheepxray.github.io/1145141919810wulongjiadao/**
+
+### 本地构建与预览
+
+```bash
+python tools/build_site.py            # 构建到 site/
+python tools/build_site.py --serve    # 构建并本地预览
+python tools/build_site.py --check    # 只做校验（链接 + 内容完整性）
+```
+
+站点共 **19 个页面**（17 篇文档 + 首页 + 工具页）。
+
+### 为什么自己写生成器而不是用 MkDocs
+
+MkDocs Material 需要一长串依赖，在当前网络环境下安装耗时且易失败。
+本生成器**只依赖 `markdown` 一个包**，能本地实际构建验证，
+且不依赖 CI 也能出结果。
+
+### 构建自带的双重校验
+
+`build_site.py` 每次构建都会跑两项检查：
+
+| 检查 | 目的 |
+|---|---|
+| **链接完整性** | 站内所有 `href` 指向的页面确实存在 |
+| **内容完整性** | 每个页面的 `<main>` 区确实含正文（≥3 个块元素、≥500 字符） |
+
+> ⚠️ 第二项是必要的：开发中曾出现「目录块覆盖了正文」的 bug，
+> 导致所有文档页**只剩目录、正文全空**，而链接检查**发现不了** ——
+> 链接全有效，页面却是空壳。所以必须显式验证正文存在。
+
+### 部署方式
+
+| 方式 | 做法 |
+|---|---|
+| **A（推荐）** | GitHub Actions 自动部署 —— push 到 `main` 即触发 |
+| B | 手动推 gh-pages 分支：`git subtree push --prefix site origin gh-pages` |
+| C | 本地预览：`python tools/build_site.py --serve` |
+
+> **首次部署需在 GitHub 仓库设置里启用 Pages**：
+> Settings → Pages → Source 选 **GitHub Actions**。
+
 ## 工具（全部可运行，且都带自测）
 
 ```bash
