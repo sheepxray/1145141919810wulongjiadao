@@ -137,7 +137,16 @@ class MotorModel:
 
 
 # ---- 候选电机 ----
+#
+# ⚠️ 2026-09 更新：用户提供了**实际电机的实测参数**，见 "ACTUAL"。
+#    它与原设计假设的 JGB37-520 电气特性相差 5 倍（24Ω vs 4.8Ω），
+#    因此第一轮「电机 86 秒烧毁」的结论**不再适用** —— 详见 docs/17。
 MOTORS = {
+    "ACTUAL": MotorModel(
+        # 用户实测参数：12V / 1:100 / 空载 300rpm / 堵转 500mA
+        # 额定 240rpm 200mA 0.5kgf·cm；标称堵转转矩 4kgf·cm（与电气推算矛盾）
+        "实际电机 12V 1:100", 12.0, 0.030, 0.500, 1.83, 300,
+        r_th_kw=15.0, c_th_jk=20.0, mass_g=100),
     "JGB37-520": MotorModel(
         "JGB37-520 12V (1:56)", 12.0, 0.15, 2.5, 5.0, 200,
         r_th_kw=8.0, c_th_jk=20.0, mass_g=95),
@@ -147,6 +156,14 @@ MOTORS = {
     "MD36N": MotorModel(
         "MD36N 12V (大扭矩)", 12.0, 0.25, 4.5, 10.0, 180,
         r_th_kw=6.0, c_th_jk=30.0, mass_g=160),
+}
+
+# 实际电机的完整标称参数（用于一致性核对）
+ACTUAL_MOTOR_SPEC = {
+    "V": 12.0, "ratio": 100,
+    "no_load_rpm": 300.0, "no_load_ma": 30.0,
+    "rated_rpm": 240.0, "rated_ma": 200.0, "rated_torque_kgfcm": 0.5,
+    "stall_torque_kgfcm": 4.0, "stall_ma": 500.0,
 }
 
 
@@ -301,32 +318,100 @@ def main():
     print("     1.5kg 的车在平地上匀速走，需要的推力不到 1N。")
     print("     所以问题不在「正常行驶」，而在下面第 2 节。")
 
-    # ---------------- 2. 正常电流 vs 堵转 ----------------
-    section("2. 各电机方案：正常电流 vs 堵转电流")
+    # ---------------- 2. 实际电机参数一致性核对 ----------------
+    section("2. ★ 实际电机参数一致性核对（用户实测）")
+    s = ACTUAL_MOTOR_SPEC
+    print(f"  实测参数：{s['V']:.0f}V，减速比 1:{s['ratio']:.0f}")
+    print(f"    空载 {s['no_load_rpm']:.0f}rpm / {s['no_load_ma']:.0f}mA")
+    print(f"    额定 {s['rated_rpm']:.0f}rpm / {s['rated_ma']:.0f}mA"
+          f" / {s['rated_torque_kgfcm']}kgf·cm")
+    print(f"    堵转 {'?'}rpm / {s['stall_ma']:.0f}mA"
+          f" / {s['stall_torque_kgfcm']}kgf·cm")
+    print()
+
+    R_elec = s["V"] / (s["stall_ma"] / 1000.0)
+    w0_rad = s["no_load_rpm"] * 2 * math.pi / 60
+    Kt = (s["V"] - (s["no_load_ma"]/1000.0) * R_elec) / w0_rad
+    T_elec = Kt * (s["stall_ma"]/1000.0) / 0.0980665
+    w_lin = s["no_load_rpm"] * (1 - s["rated_ma"] / s["stall_ma"])
+    T_lin = T_elec * (s["rated_ma"] - s["no_load_ma"]) / \
+        (s["stall_ma"] - s["no_load_ma"])
+
+    print(f"  由电气参数反推：")
+    print(f"    绕组电阻 R      = {s['V']:.0f}/{s['stall_ma']/1000:.3f} = "
+          f"{R_elec:.1f} ohm")
+    print(f"    Kt = Ke         = {Kt:.4f} N·m/A")
+    print(f"    堵转转矩        = {T_elec:.2f} kgf·cm")
+    print(f"    额定转速(线性)  = {w_lin:.0f} rpm")
+    print(f"    额定转矩(线性)  = {T_lin:.2f} kgf·cm")
+    print()
+
+    rows = [
+        ["堵转转矩", f"{T_elec:.2f}", f"{s['stall_torque_kgfcm']:.2f}",
+         f"**{s['stall_torque_kgfcm']/T_elec:.1f}x 矛盾**"],
+        ["额定转速", f"{w_lin:.0f}", f"{s['rated_rpm']:.0f}",
+         f"差 {s['rated_rpm']-w_lin:.0f}rpm"],
+        ["额定转矩", f"{T_lin:.2f}", f"{s['rated_torque_kgfcm']:.2f}",
+         "**吻合**"],
+    ]
+    table(["项目", "电气推算", "手册标称", "判读"], rows)
+    print()
+    print("  >> 结论：标称「额定转矩」与堵转电流自洽，")
+    print("     但标称「堵转转矩 4.0」与它们**矛盾 2.2 倍**。")
+    print()
+    print("     两种自洽读法（纸面无法判断）：")
+    R_b = s["V"] / (T_elec * (s["stall_torque_kgfcm"] / T_elec) /
+                    Kt) if False else None
+    i_stall_b = s["stall_torque_kgfcm"] * 0.0980665 / Kt
+    R_b = s["V"] / i_stall_b
+    table(["读法", "绕组Ω", "堵转电流A", "堵转转矩kgf·cm"],
+          [["A（按 500mA）", f"{R_elec:.1f}", f"{s['stall_ma']/1000:.3f}",
+            f"{T_elec:.2f}"],
+           ["B（按 4kgf·cm）", f"{R_b:.1f}", f"{i_stall_b:.2f}",
+            f"{s['stall_torque_kgfcm']:.2f}"]])
+    print()
+    print("  ★ 判定方法：**用万用表量线圈电阻**（30 秒可定论）")
+    print(f"     约 {R_elec:.0f}Ω -> 读法 A；约 {R_b:.0f}Ω -> 读法 B")
+    print()
+    print("  ⚠️ 本文后续按**保守读法 A**（堵转 500mA）计算，")
+    print("     因为该读法的转矩裕度更小，是安全侧。")
+
+    # ---------------- 3. 正常电流 vs 堵转 ----------------
+    section("3. 各电机方案：正常电流 vs 堵转电流")
     rows = []
     for key, m in MOTORS.items():
         i_norm = m.current_at_torque(tq["tau_kgcm"])
         rows.append([
             m.name,
-            f"{m.tau_stall:.1f}",
+            f"{m.tau_stall:.2f}",
             f"{m.r_winding:.1f}",
-            f"{i_norm:.2f}",
-            f"{m.i_stall:.1f}",
+            f"{i_norm:.3f}",
+            f"{m.i_stall:.2f}",
             f"{m.i_stall/i_norm:.0f}x",
         ])
     table(["电机", "堵转转矩kgf·cm", "绕组Ω", "正常电流A",
            "堵转电流A", "倍数"], rows)
     print()
-    m0 = MOTORS["JGB37-520"]
+    m0 = MOTORS["ACTUAL"]
     i_norm0 = m0.current_at_torque(tq["tau_kgcm"])
-    print(f"  >> 以 JGB37-520 为例：")
-    print(f"     正常行驶每台 {i_norm0:.2f}A，两台共 {i_norm0*2:.2f}A "
-          f"= {i_norm0*2*12:.1f}W")
-    print(f"     堵转时每台 {m0.i_stall:.1f}A，两台共 {m0.i_stall*2:.1f}A "
-          f"= {m0.i_stall*2*12:.0f}W")
+    ma = MOTORS["JGB37-520"]
+    print(f"  >> 实际电机 vs 原设计假设：")
+    table(["项目", "实际电机", "原假设 JGB37-520", "倍数"],
+          [["绕组", f"{m0.r_winding:.1f}Ω", f"{ma.r_winding:.1f}Ω",
+            f"{m0.r_winding/ma.r_winding:.1f}x"],
+           ["堵转电流", f"{m0.i_stall:.2f}A", f"{ma.i_stall:.1f}A",
+            f"{ma.i_stall/m0.i_stall:.1f}x"],
+           ["堵转发热", f"{m0.v*m0.i_stall:.1f}W",
+            f"{ma.v*ma.i_stall:.0f}W",
+            f"{ma.v*ma.i_stall/(m0.v*m0.i_stall):.1f}x"]])
     print()
-    print(f"     电流差 {m0.i_stall/i_norm0:.0f} 倍 —— 这就是你说的「电流过大」的来源。")
-    print(f"     **但它只在堵转/启动瞬间出现，不是常态。**")
+    print(f"  >> 实际电机正常行驶每台 {i_norm0:.3f}A，两台 "
+          f"{i_norm0*2:.3f}A = {i_norm0*2*12:.1f}W")
+    print(f"     堵转每台 {m0.i_stall:.2f}A，两台 {m0.i_stall*2:.2f}A "
+          f"= {m0.i_stall*2*12:.1f}W")
+    print()
+    print("  ⚠️ **实际电机比原假设「小」5 倍** —— 后续热分析与")
+    print("     限流要求需按新参数重算（见下一节）。")
 
     # ---------------- 3. 堵转热分析（核心风险）----------------
     section("3. ★ 真正会烧东西的地方：堵转热效应")
@@ -350,45 +435,85 @@ def main():
     print()
     print("  参数说明：允许温升取 100K（25°C 环境 -> 125°C 绕组）")
     print()
-    m0 = MOTORS["JGB37-520"]
-    print(f"  >> 以 JGB37-520 为例：")
-    print(f"     堵转发热 {m0.stall_power():.0f}W，而安全电流只有 "
-          f"{m0.max_safe_current():.2f}A")
-    print(f"     热时间常数 τ = R_th × C_th = {m0.r_th} × {m0.c_th} "
-          f"= {m0.tau_th:.0f} 秒")
+    m0 = MOTORS["ACTUAL"]
+    ma = MOTORS["JGB37-520"]
     t_burn0 = m0.time_to_overheat(m0.i_stall)
-    print(f"     持续堵转 {t_burn0:.0f} 秒后绕组烧毁")
+    print(f"  >> ★ 实际电机（堵转 {m0.i_stall:.2f}A）：")
+    print(f"     堵转发热仅 {m0.stall_power():.1f}W，安全电流 "
+          f"{m0.max_safe_current():.2f}A")
+    print(f"     热时间常数 τ = {m0.r_th}×{m0.c_th} = {m0.tau_th:.0f} 秒")
+    if t_burn0:
+        print(f"     持续堵转 {t_burn0:.0f} 秒后绕组烧毁")
+    else:
+        print(f"     **平衡温升 {m0.stall_power()*m0.r_th:.0f}K 低于 100K 限值**")
+        print(f"     -> 该电机可**长期堵转不烧**（在假设的散热条件下）")
     print()
-    print(f"     注意区分两个时间尺度：")
-    print(f"       τ = {m0.tau_th:.0f}s  是「升温快慢」（热惯性）")
-    print(f"       {t_burn0:.0f}s     是「多久到达 100K 温升」（危险阈值）")
-    print(f"     本例中平衡温升 {m0.stall_power()*m0.r_th:.0f}K 远超 100K 限值，")
-    print(f"     所以 {t_burn0:.0f}s 就烧，而不是等到 τ 的 3-5 倍。")
+    print(f"  >> 对比原设计假设的 JGB37-520：")
+    t_burn_a = ma.time_to_overheat(ma.i_stall)
+    table(["项目", "实际电机", "JGB37-520(原假设)"],
+          [["堵转电流", f"{m0.i_stall:.2f}A", f"{ma.i_stall:.1f}A"],
+           ["堵转发热", f"{m0.stall_power():.1f}W",
+            f"{ma.stall_power():.0f}W"],
+           ["安全电流", f"{m0.max_safe_current():.2f}A",
+            f"{ma.max_safe_current():.2f}A"],
+           ["烧毁时间", f"{t_burn0:.0f}s" if t_burn0 else "不烧",
+            f"{t_burn_a:.0f}s"]])
     print()
-    print(f"  ⚠️ 比赛单场 3 分钟（180 秒）。如果车顶住墙 {t_burn0:.0f} 秒，电机就废了。")
-    print("     这不是理论风险 —— 顶墙推棋子、被对方车挡住都会发生。")
+    print("  ⚠️ **重要更正**：")
+    print("     第一轮基于 JGB37-520 得出「86 秒烧毁」的结论，")
+    print("     在实际电机上**不成立** —— 它的发热只有 1/5。")
     print()
-    print("  >> 结论：**真正的风险不是电池，是电机烧毁。**")
-    print("     而且这个风险不能靠「选更大的电池」解决，")
-    print("     只能靠**限流**（见第 7 节）。")
+    print("     但**限流仍然是必要的**，理由变了：")
+    print(f"     - 不是因为会烧，而是保护驱动板与电源轨")
+    print(f"     - 且热参数 R_th 是**假设值**，必须实测确认")
+    print(f"       （见下方敏感性分析）")
 
     # 热时间常数敏感性
     print()
-    print("  热参数敏感性（结论是否稳健）：")
-    rows = []
-    for r_th in [6.0, 8.0, 10.0, 12.0]:
-        for c_th in [15.0, 20.0, 30.0]:
-            mm = MotorModel("sensitivity", 12.0, 0.15, 2.5, 5.0, 200,
-                            r_th, c_th, 95)
-            t = mm.time_to_overheat(mm.i_stall)
-            rows.append([f"{r_th:.0f}", f"{c_th:.0f}",
-                         f"{r_th*c_th:.0f}",
-                         f"{mm.max_safe_current():.2f}",
-                         f"{t:.0f}" if t else "不烧"])
-    table(["R_th(K/W)", "C_th(J/K)", "τ(s)", "安全电流A", "烧毁时间s"], rows)
+    print("  热参数敏感性（用**实际电机**参数，检验「不烧」是否稳健）：")
     print()
-    print("  >> 无论参数怎么取，**烧毁时间都在 20-120 秒量级**，")
-    print("     而安全电流都在 **0.9-1.7A** 之间。结论稳健：必须限流。")
+    print("  ⚠️ R_th 是**假设值**，而「不烧」的结论完全取决于它。")
+    print("     实际电机的 R_th 未实测 —— 下面扫过合理区间。")
+    print()
+    rows = []
+    for r_th in [8.0, 12.0, 15.0, 20.0, 25.0, 30.0]:
+        for c_th in [15.0, 20.0, 30.0]:
+            mm = MotorModel("sens", 12.0, 0.030, 0.500, 1.83, 300,
+                            r_th, c_th, 100)
+            t = mm.time_to_overheat(mm.i_stall)
+            dT = mm.stall_power() * r_th
+            rows.append([f"{r_th:.0f}", f"{c_th:.0f}",
+                         f"{mm.tau_th:.0f}",
+                         f"{dT:.0f}",
+                         f"{mm.max_safe_current():.2f}",
+                         f"{t:.0f}" if t else "**不烧**"])
+    table(["R_th(K/W)", "C_th(J/K)", "τ(s)", "平衡温升K",
+           "安全电流A", "烧毁时间s"], rows)
+    print()
+    R_th_crit = 100.0 / m0.stall_power()
+    print(f"  >> 判读：实际电机堵转发热仅 {m0.stall_power():.1f}W。")
+    print(f"     平衡温升 = {m0.stall_power():.1f} x R_th，")
+    print(f"     **临界散热热阻 = {R_th_crit:.1f} K/W**：")
+    print(f"       R_th < {R_th_crit:.1f}  -> 平衡温升超 100K -> 会烧")
+    print(f"       R_th > {R_th_crit:.1f}  -> 平衡温升低于限值 -> 长期堵转不烧")
+    print()
+    print(f"     表中 R_th=8/12/15 三档均「不烧」（温升 48/72/90K），")
+    print(f"     仅 R_th>=20（温升 >=120K）才会烧，且时间在 400-1000s。")
+    print()
+    print("  ★ 注意「安全电流」列恒为 0.50A，含义是：")
+    print("     该电机的**堵转电流本身就等于它的持续安全电流上限**")
+    print("     —— 即长期堵转恰好处于温升限值的边缘。")
+    print()
+    print("  >> 修正后的结论：")
+    print("     - 实际电机**不会像 JGB37-520 那样 86 秒烧毁**")
+    print(f"     - 但热裕度**很薄**：假设 R_th=15 时温升 {m0.stall_power()*15:.0f}K，")
+    print(f"       距 100K 限值只剩 {100-m0.stall_power()*15:.0f}K")
+    print("     - 限流**仍建议做**，理由从「防烧毁」变为")
+    print("       「防驱动板过流 + 给热裕度留余量」")
+    print()
+    print("  ⚠️ **必须实测 R_th**：它是本节的唯一假设值，")
+    print("     且直接决定「烧不烧」。方法：K 型热电偶贴绕组，")
+    print("     堵转 3 分钟后读温升，反算 R_th。")
 
     # ---------------- 4. 各轨道电流预算 ----------------
     section("4. 各轨道电流预算（按 1080p@30 需求）")
@@ -577,19 +702,42 @@ def main():
 
     # ---------------- 8. 结论 ----------------
     section("8. 结论与选型建议")
-    print("  【电流问题的定性】")
-    print(f"    正常行驶  {i_norm0*2:.2f}A（{i_norm0*2*12:.0f}W）  <- 很小，不是问题")
-    print(f"    堵转峰值  {m0.i_stall*2:.1f}A（{m0.i_stall*2*12:.0f}W）  <- 大，但毫秒级")
-    print(f"    堵转持续  会让电机在 {m0.time_to_overheat(m0.i_stall):.0f} 秒内烧毁  <- ★ 真正的风险")
+    i2 = m0.i_stall * 2
+    print("  【电流问题的定性（按实际电机参数）】")
+    print(f"    正常行驶  {i_norm0*2:.3f}A（{i_norm0*2*12:.1f}W）  <- 可忽略")
+    print(f"    堵转峰值  {i2:.2f}A（{i2*12:.1f}W）  <- 也不大")
     print()
-    print("  【选型结论】")
+    t_b = m0.time_to_overheat(m0.i_stall)
+    if t_b:
+        print(f"    堵转持续  {t_b:.0f} 秒内烧毁  <- ★ 风险点")
+    else:
+        print(f"    堵转持续  **在假设散热下不烧**（平衡温升 "
+              f"{m0.stall_power()*m0.r_th:.0f}K < 100K）")
+        print(f"              但热裕度薄，且 R_th 是假设值 -> 仍需实测")
+    print()
+    print("  【★ 与原设计假设的关键差异】")
+    table(["项目", "实际电机", "原假设 JGB37-520", "影响"],
+          [["绕组", f"{m0.r_winding:.1f}Ω", f"{ma.r_winding:.1f}Ω",
+            "电流小 5x"],
+           ["堵转电流", f"{m0.i_stall:.2f}A", f"{ma.i_stall:.1f}A",
+            "电源压力大减"],
+           ["堵转发热", f"{m0.stall_power():.1f}W",
+            f"{ma.stall_power():.0f}W", "热风险大减"],
+           ["烧毁时间", f"{t_b:.0f}s" if t_b else "不烧",
+            f"{ma.time_to_overheat(ma.i_stall):.0f}s",
+            "第一轮结论失效"]])
+    print()
+    print("  【选型结论（需按实际电机更新）】")
     rows = [
-        ["电机", "JGB37-520 12V 1:56", "¥68 x2", "加限流后可长期堵转"],
-        ["驱动", "BTS7960 / IBT-2", "¥12 x2", "43A，远超需求"],
-        ["★ 电流采样", "INA240 或 ACS712", "¥12 x2", "新增，限流必需"],
-        ["电池", "3S 1500mAh 25C", "¥85", "内阻 105mΩ，压降小"],
-        ["动力线", "18 AWG", "-", "持续余量 2.6x，峰值压降 0.09V"],
-        ["保险丝", "5A 慢熔", "¥5", "耐峰值、保护 18AWG"],
+        ["电机", "实际到手的 12V 1:100", "—",
+         "堵转仅 0.5A，裕度充足"],
+        ["驱动", "BTS7960 / IBT-2", "¥12 x2",
+         "43A 对 0.5A 严重过剩，可降级省成本"],
+        ["电流采样", "INA240 或 ACS712", "¥12 x2",
+         "仍建议，但理由变为保护驱动板"],
+        ["电池", "3S 1500mAh 25C", "¥85", "压降 0.75V，仍合适"],
+        ["动力线", "18 AWG", "-", "对 1A 峰值严重过剩，可降 22AWG"],
+        ["保险丝", "5A 慢熔", "¥5", "可降到 3A"],
         ["视觉轨", "DC-DC 5V 5A", "¥25", "RK3588 需 1.8A + 余量"],
         ["逻辑轨", "5V->3.3V 2A", "¥10", "主控 + IMU + 传感器"],
     ]
@@ -604,9 +752,40 @@ def main():
     print()
     print(f"    续航在两种情况下都远超需求（≥19 分钟 vs 3 分钟），")
     print(f"    所以**不是**选电池的依据。")
+
+    # ---------------- 9. 按实际电机的选型复核 ----------------
+    section("9. ★ 按实际电机的选型复核（哪些现在过剩了）")
+    print("  实际电机堵转仅 0.50A，而第一轮是按 2.5A 选型的。")
+    print("  因此以下部件的**规格严重过剩**，可降价或减重：")
+    print()
+    i_pk2 = m0.i_stall * 2
+    rows = [
+        ["电机驱动", "BTS7960 (43A)",
+         f"峰值 {i_pk2:.2f}A 的 {43/i_pk2:.0f} 倍",
+         "可换 DRV8871 (3.6A) 省 ¥0，或保留求稳"],
+        ["动力线", "18 AWG (7A)",
+         f"峰值的 {7/i_pk2:.0f} 倍",
+         "可降 22 AWG，减重约 10g"],
+        ["保险丝", "5A 慢熔",
+         f"峰值的 {5/i_pk2:.0f} 倍",
+         "可降 2A，保护更精确"],
+        ["电流采样", "INA240 (可测 ±5A)",
+         f"峰值 {i_pk2:.2f}A",
+         "**仍需保留** —— 理由变为保护驱动板与诊断堵转"],
+    ]
+    table(["部件", "当前选型", "过剩倍数", "建议"], rows)
+    print()
+    print("  >> 但**不建议现在就降级**，理由：")
+    print("     1. 电机参数尚未确认（读法 A vs B，见第 2 节）")
+    print("        若实为读法 B（1.09A 堵转），过剩倍数减半")
+    print("     2. 堵转是暂态，启动冲击电流可能高于稳态堵转")
+    print("     3. BTS7960 只贵 ¥12/个，保留裕度的成本极低")
+    print()
+    print("  ★ **真正该做的是**：确认电机参数后，重新核对本表。")
     print()
     print("=" * 84)
-    print("第 1 轮迭代完成。下一步（第 2 轮）：基于本文的功耗结论选主控平台。")
+    print("注：本文档已按**实际电机参数**更新（2026-09）。")
+    print("    第一轮基于 JGB37-520 的「86 秒烧毁」结论已标注失效。")
     print("=" * 84)
 
 
