@@ -88,14 +88,31 @@ NAV = [
         ("17", "17-实际电机参数核对.md", "实际电机参数核对"),
         ("18", "18-采购记录_20260928.md", "采购记录（2026-09-28）"),
     ]),
+    ("器件资料", [
+        ("hw-tb6612", "", "TB6612 / MG513X 规格"),
+        ("hw-iface", "", "电气接口定义"),
+    ]),
 ]
 
-# 页面 slug -> 源文件
+# --------------------------------------------------------------------------
+# 器件/硬件资料页：源文件不在 docs/，而在 hardware/ 等目录下。
+# 路径**相对仓库根目录**（不是相对 docs/）。
+# --------------------------------------------------------------------------
+EXTRA_PAGES = [
+    ("hw-tb6612", "hardware/electrical/TB6612_MG513X_规格.md",
+     "TB6612 / MG513X 规格"),
+    ("hw-iface", "hardware/electrical/接口定义.md", "电气接口定义"),
+]
+
+# 页面 slug -> 源文件（docs/ 内，相对 docs/）
 PAGES = {}
 for _grp, _items in NAV:
     for _slug, _path, _title in _items:
         if _slug != "index":
             PAGES[_slug] = _path
+
+# 页面 slug -> 源文件（相对仓库根）
+PAGES_EXTRA = {_slug: _path for _slug, _path, _title in EXTRA_PAGES}
 
 
 # ==========================================================================
@@ -103,8 +120,13 @@ for _grp, _items in NAV:
 # ==========================================================================
 
 TOOLS_INFO = [
-    ("power_budget.py", "电源与电流预算", "第 1 轮",
-     "电机电气模型、堵转热分析、电池压降、线径保险丝、限流验证"),
+    ("drive_check.py", "驱动校核", "★ 当前权威",
+     "4×MG513X + TB6612 四路：车速、编码器分辨率、牵引力、四轮电流、"
+     "驱动发热与 65°C 保护风险、质量预算"),
+    ("motor_consistency.py", "手册参数一致性核对", "★ 当前权威",
+     "用直流电机线性模型检验 MG513X 手册四参数是否自洽，找出矛盾项"),
+    ("power_budget.py", "电源与电流预算", "第 1 轮 · 历史档案",
+     "旧 2 电机差速方案：电机电气模型、堵转热分析、电池压降、线径保险丝、限流验证"),
     ("compute_budget.py", "主控算力预算", "第 2 轮",
      "控制环 CPU 占用率、内存预算、架构方案对比、CPU vs NPU 瓶颈诊断"),
     ("vision_pipeline.py", "1080p 视觉管线", "第 3 轮",
@@ -248,6 +270,10 @@ class DocLinkRewriter:
         # 文件名 -> slug
         self.name_to_slug = {}
         for slug, path, title in [(s, p, t) for _, items in NAV for s, p, t in items]:
+            if path:
+                self.name_to_slug[os.path.basename(path)] = slug
+        # 硬件/器件资料页也参与链接重写（docs 里会引用它们）
+        for slug, path, title in EXTRA_PAGES:
             self.name_to_slug[os.path.basename(path)] = slug
 
     def rewrite(self, html_body):
@@ -715,6 +741,8 @@ def build(check_only=False):
     missing = []
     for slug, path, title in [(s, p, t) for _, items in NAV for s, p, t in items
                               if s != "index"]:
+        if not path:
+            continue        # 器件资料页由 EXTRA_PAGES 处理
         src = os.path.join(DOCS, path)
         if not os.path.exists(src):
             missing.append(path)
@@ -749,6 +777,36 @@ def build(check_only=False):
             out = os.path.join(SITE, f"{slug}.html")
             io.open(out, "w", encoding="utf-8").write(
                 page(title, body, active_slug=slug))
+        rendered += 1
+
+    # ---- 器件/硬件资料页 ----
+    for slug, relpath, title in EXTRA_PAGES:
+        src = os.path.join(ROOT, relpath)
+        if not os.path.exists(src):
+            missing.append(relpath)
+            continue
+        text = io.open(src, encoding="utf-8").read()
+        lines = text.split("\n")
+        if lines and lines[0].lstrip().startswith("# "):
+            lines = lines[1:]
+        text = "\n".join(lines)
+        md = markdown.Markdown(extensions=MD_EXTENSIONS, extension_configs=MD_CONFIG)
+        body = md.convert(text)
+        body = rewriter.rewrite(body)
+        toc = getattr(md, "toc", "")
+        if toc:
+            toc = re.sub(r'<div class="toc">|</div>', "", toc)
+            body = body + (
+                f'<details class="tocbox" style="margin:0 0 26px;'
+                f'padding:12px 16px;background:var(--bg2);'
+                f'border:1px solid var(--bd);border-radius:8px">'
+                f'<summary style="cursor:pointer;color:var(--tx2);'
+                f'font-size:13.5px">本页目录</summary>'
+                f'<div style="margin-top:9px;font-size:13.5px">{toc}</div>'
+                f'</details>')
+        if not check_only:
+            io.open(os.path.join(SITE, f"{slug}.html"), "w",
+                    encoding="utf-8").write(page(title, body, active_slug=slug))
         rendered += 1
 
     # ---- 首页与工具页 ----
@@ -808,7 +866,7 @@ def check_nav_coverage():
     导致站点**静默漏掉整页**——构建成功、链接全有效，只是那一页不存在。
     人的眼睛不会发现"少了一页"，所以必须由脚本拦住。
     """
-    in_nav = {os.path.basename(p) for _, items in NAV for _, p, _ in items}
+    in_nav = {os.path.basename(p) for _, items in NAV for _, p, _ in items if p}
     on_disk = {f for f in os.listdir(DOCS)
                if f.endswith(".md") and f != "index.md"}
 

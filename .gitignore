@@ -82,6 +82,13 @@ datasets/
 *.pack
 # 厂商例程全集（22 个工程，含重复 HAL 库，约 2.7GB），本地参考不入库
 firmware/stm32/examples/
+# ---- 本地存档 / 工具链 / 临时产物（体积大，不入库）----
+outputs/
+_本地存档_不入库/
+_工具链/
+_tmp_extract/
+/_*.txt
+/_*.py
 # ---- 参考资料（体积大或含第三方版权，不入库）----
 # STM32 手册 / 数据手册 / 厂商文档：本地查阅即可
 firmware/stm32/docs/
