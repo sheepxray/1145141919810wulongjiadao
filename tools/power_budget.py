@@ -1,8 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-电源与电流预算工具
-==================
+电源与电流预算工具 ⚠️【历史第 1 轮档案 · 数字部分失效】
+========================================================
+
+> ## 🚨 本工具基于**旧电机 JGB37-520**，数字不可直接引用
+>
+> 当前方案是 **4×MG513X（麦轮）+ TB6612 四路 D24A**，
+> 而本工具按 **2×JGB37-520（差速）+ BTS7960** 计算。
+>
+> | 项目 | 本工具（旧） | 当前方案（实际） |
+> |---|---|---|
+> | 电机 | JGB37-520 ×2，堵转 2.5A | **MG513X ×4，堵转 1.5–3.2A** |
+> | 驱动 | BTS7960（43A） | **TB6612 四路 D24A（1.2A/通道）** |
+> | 堵转发热 | 30W/台 | 约 6–18W/台（读数待定） |
+> | 主控/视觉 | H723 / RK3588 | **G474 / K230D** |
+>
+> **当前权威口径**：
+> - 驱动与电机校核 → [`tools/drive_check.py`](drive_check.py) ★
+> - 器件参数 → `hardware/electrical/TB6612_MG513X_规格.md`
+> - 参数一致性 → [`tools/motor_consistency.py`](motor_consistency.py)
+>
+> **本工具仍保留的方法论**：
+> - 电机电气模型（正常 vs 堵转）的分析框架
+> - 电池内阻/压降/线径/保险丝的 sizing 方法
+> - 单点星型接地、brownout 防护等**架构结论**（与电机无关）
 
 用途：回答"电流到底大在哪一环、电源该怎么选"。
 
@@ -28,12 +50,26 @@
 """
 
 import math
-import sys
 
+import sys as _sys
+
+# Windows 控制台默认 GBK，无法显示 emoji / 部分符号
 try:
-    sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stderr.reconfigure(encoding="utf-8")
 except Exception:
     pass
+
+
+def _warn_obsolete():
+    """运行时醒目警告 —— 本工具基于旧平台，数字不可直接引用。"""
+    bar = "=" * 70
+    _sys.stderr.write("\n" + bar + "\n")
+    _sys.stderr.write("⚠️  警告：本工具基于【旧电机 JGB37-520 + BTS7960】，数字已失效！\n")
+    _sys.stderr.write("    当前方案为 4×MG513X（麦轮）+ TB6612 四路 D24A。\n")
+    _sys.stderr.write("    正确口径见 hardware/electrical/TB6612_MG513X_规格.md，\n")
+    _sys.stderr.write("    驱动校核见 tools/drive_check.py（权威）。\n")
+    _sys.stderr.write(bar + "\n\n")
 
 
 # ==========================================================================
@@ -795,4 +831,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _warn_obsolete()
     main()

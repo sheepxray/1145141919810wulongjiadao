@@ -21,12 +21,25 @@
 """
 
 import math
-import sys
 
+import sys as _sys
+
+# Windows 控制台默认 GBK，无法显示 emoji / 部分符号
 try:
-    sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stderr.reconfigure(encoding="utf-8")
 except Exception:
     pass
+
+
+def _warn_obsolete():
+    """运行时醒目警告 —— 本工具基于旧平台，数字不可直接引用。"""
+    bar = "=" * 70
+    _sys.stderr.write("\n" + bar + "\n")
+    _sys.stderr.write("⚠️  警告：本工具推荐【RK3588 + H723】，与实际采购【K230D + G474】相反！\n")
+    _sys.stderr.write("    结论部分见 docs/13（已标注失效），实际方案见 docs/16。\n")
+    _sys.stderr.write("    但其中「瓶颈在 CPU 侧非 NPU」等洞察仍成立。\n")
+    _sys.stderr.write(bar + "\n\n")
 
 
 # ==========================================================================
@@ -535,4 +548,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _warn_obsolete()
     main()

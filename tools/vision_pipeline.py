@@ -25,12 +25,25 @@
 """
 
 import math
-import sys
 
+import sys as _sys
+
+# Windows 控制台默认 GBK，无法显示 emoji / 部分符号
 try:
-    sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stderr.reconfigure(encoding="utf-8")
 except Exception:
     pass
+
+
+def _warn_obsolete():
+    """运行时醒目警告 —— 本工具基于旧平台，数字不可直接引用。"""
+    bar = "=" * 70
+    _sys.stderr.write("\n" + bar + "\n")
+    _sys.stderr.write("⚠️  警告：本工具假设【RK3588 的 RGA 硬件加速】，K230D 上不存在该硬件！\n")
+    _sys.stderr.write("    结论部分见 docs/14（已标注全部失效），实际方案见 docs/16。\n")
+    _sys.stderr.write("    帧率需在 K230D 上用 firmware/k230/profiler.py 重新实测。\n")
+    _sys.stderr.write(bar + "\n\n")
 
 
 # ==========================================================================
@@ -403,4 +416,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _warn_obsolete()
     main()

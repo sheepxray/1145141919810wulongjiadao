@@ -1,8 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-质量与预算校核工具（五轮迭代后的最终版）
-========================================
+质量与预算校核工具 ⚠️【历史五轮档案 · 数字已失效】
+====================================================
+
+> ## 🚨 本工具计算的是**旧方案**（2 电机差速），数字**不可用于当前设计**
+>
+> 当前方案是**麦轮全向（4×MG513X）**，仅电机就占 680g，
+> 而本工具按 2 个电机（190g）计算，**结果完全不对**。
+>
+> | 项目 | 本工具（旧） | 当前方案（实际） |
+> |---|---|---|
+> | 电机 | JGB37-520 ×2 = 190g | **MG513X ×4 = 680g** |
+> | 主控 | STM32H723 ¥130 | STM32G474VET6 ¥60 |
+> | 视觉 | RK3588 + 双 IMX219 | K230D + 单 OV5640 |
+> | 驱动 | BTS7960 ×2 | TB6612 四路 D24A |
+> | 总质量 | 987g / 1134g | ⚠️ **待实测**（见 docs/16 §1） |
+>
+> **当前权威口径**：
+> - 实际下单与质量预警 → [docs/16](../docs/16-最终商品清单.md)
+> - 驱动/电机校核 → [`tools/drive_check.py`](drive_check.py)
+> - 器件参数 → `hardware/electrical/TB6612_MG513X_规格.md`
+>
+> 本工具保留仅作**方法论参考**（质量预算表的结构值得沿用）。
 
 赛题硬约束：
     发车质量 <= 1.5 kg
@@ -18,6 +38,27 @@
 用法：
     python tools/mass_budget.py
 """
+
+import sys as _sys
+import os as _os
+
+# Windows 控制台默认 GBK，无法显示 emoji / 部分符号
+try:
+    _sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
+
+# 运行时醒目警告（避免误用旧数字）
+def _warn_obsolete():
+    _sys.stderr.write(
+        "\n" + "=" * 70 + "\n"
+        "⚠️  警告：本工具计算的是【旧方案 2 电机差速】，数字已失效！\n"
+        "    当前方案为麦轮全向（4×MG513X），仅电机就占 680g。\n"
+        "    正确口径见 docs/16-最终商品清单.md §1，\n"
+        "    驱动校核见 tools/drive_check.py。\n"
+        + "=" * 70 + "\n\n")
 
 import sys
 
@@ -208,4 +249,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _warn_obsolete()
     main()
