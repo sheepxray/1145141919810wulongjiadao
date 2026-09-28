@@ -1,4 +1,4 @@
-# STM32G431 固件骨架
+# STM32G474 固件骨架
 
 > 对应文档：[docs/03-电控与驱动系统](../../docs/03-电控与驱动系统.md)、
 > [docs/05-定位与导航](../../docs/05-定位与导航.md)、
@@ -30,6 +30,17 @@ firmware/stm32/
   └─ comms/
        └─ k230_link.c/.h      串口协议（docs/11）
 ```
+
+## 配套资料
+
+| 目录 | 内容 |
+|---|---|
+| datasheets/ | STM32G474VE 数据手册、M 板原理图 / 接口结构图、Altium 封装库（SCHLIB / PcbLib） |
+| docs/can/ | FDCAN 外设、CAN_FD 配置、收发器芯片（SN65HVD230 / TJA1051 / NXP）手册 |
+| docs/cubemx/ | STM32CubeMX 官方 UM 文档 |
+| xamples/ | 厂商 DevEBox-G474 例程 22 个（LED/ADC/DAC/DMA/SPI/USB/LCD/CAN_FD/综合例程），本地参考，约 2.7GB，未入库（见 .gitignore） |
+
+> 主控已由 **STM32G431 改为 STM32G474VE**（Cortex-M4，带 FDCAN / USB / LCD 接口）。外设引脚映射需按 G474 重新核对后再落地 sp/。
 
 ## 参考实现
 
