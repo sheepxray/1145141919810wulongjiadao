@@ -90,3 +90,8 @@ hardware/datasheets/
 hardware/electrical/datasheets/
 *.pdf
 *.PDF
+
+# ---- 临时草稿 / 调试输出（编辑过程残留）----
+# 形如 _q10.txt / _sec01.txt / _pb.txt 的片段文件不应入库
+_*.txt
+_*.log

@@ -18,6 +18,11 @@
   6. 驱动板热裕度
   7. 缓解措施与验收标准
 
+
+> ⚠️ **2026-09-28：本脚本的电机参数已过时，仅为「旧平台 2 电机差速」的历史档案。**
+> 实际硬件是 **4 × MG513X + TB6612 四路**，请用
+> `python tools/drive_check.py`（权威）与
+> `hardware/electrical/TB6612_MG513X_规格.md`、`docs/17-实际电机参数核对.md`。
 运行：
     python tools/power_budget.py
 """
