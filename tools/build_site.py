@@ -86,6 +86,7 @@ NAV = [
     ]),
     ("更新记录", [
         ("17", "17-实际电机参数核对.md", "实际电机参数核对"),
+        ("18", "18-采购记录_20260928.md", "采购记录（2026-09-28）"),
     ]),
 ]
 
@@ -799,6 +800,40 @@ def check_links():
     return 0
 
 
+def check_nav_coverage():
+    """
+    检查 docs/ 里的每篇文档都已编入 NAV。
+
+    ★ 这检查是必要的：曾发生 docs/18 加入仓库但没加进 NAV，
+    导致站点**静默漏掉整页**——构建成功、链接全有效，只是那一页不存在。
+    人的眼睛不会发现"少了一页"，所以必须由脚本拦住。
+    """
+    in_nav = {os.path.basename(p) for _, items in NAV for _, p, _ in items}
+    on_disk = {f for f in os.listdir(DOCS)
+               if f.endswith(".md") and f != "index.md"}
+
+    # index 是首页占位（由 build_home() 生成，无对应 md 文件），
+    # 不算"引用不存在的文件"
+    extra = sorted(f for f in in_nav - on_disk if f != "index.md")
+    missing = sorted(on_disk - in_nav)
+
+    print("\nNAV 覆盖检查：")
+    if extra:
+        print(f"  ⚠️ NAV 中引用了不存在的文件：")
+        for f in extra:
+            print(f"    {f}")
+
+    if missing:
+        print(f"  ⚠️ **docs/ 中有 {len(missing)} 篇未编入 NAV（站点会漏掉）**：")
+        for f in missing:
+            print(f"    {f}")
+        print(f"  请把它们加入 tools/build_site.py 的 NAV")
+        return 1
+
+    print(f"  {len(on_disk)} 篇文档全部已编入 NAV ✓")
+    return 0 if not extra else 1
+
+
 def check_content():
     """
     检查每个页面确实含正文。
@@ -867,7 +902,8 @@ def main():
     print("=" * 78)
 
     if args.check:
-        rc = check_links()
+        rc = check_nav_coverage()
+        rc |= check_links()
         rc |= check_content()
         return rc
 
@@ -883,7 +919,8 @@ def main():
     print(f"    {n_html} 个 HTML 页面")
     print(f"    输出目录：{SITE}")
 
-    rc = check_links()
+    rc = check_nav_coverage()
+    rc |= check_links()
     rc |= check_content()
 
     print(f"\n[3] 部署方式")

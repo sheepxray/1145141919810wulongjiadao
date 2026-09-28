@@ -44,7 +44,11 @@ firmware/stm32/
 
 ## 参考实现
 
-`reference/` 目录下有 **可直接运行的 Python 参考实现**，用于验证算法后再移植到 C：
+`reference/` 目录下有两类参考：
+
+### A. Python 算法参考（可直接运行）
+
+用于验证算法后再移植到 C：
 
 | 文件 | 内容 |
 |---|---|
@@ -52,6 +56,38 @@ firmware/stm32/
 | `reference/scoring.py` | 目标打分函数（含帅/将支配项与送分规避） |
 
 **先跑 Python 确认算法正确，再移植** —— 在 MCU 上调试数学公式代价高得多。
+
+### B. ICM20602 驱动参考（⚠️ 需移植）
+
+`reference/icm20602/` 是厂商提供的三种接口实现：
+
+| 目录 | 接口 |
+|---|---|
+| `hardware_spi/` | 硬件 SPI |
+| `software_spi/` | 软件模拟 SPI |
+| `software_iic/` | 软件模拟 I²C |
+
+> ### ⚠️ 这份代码是 **STM32F103ZET6** 工程，不是 G474
+>
+> 三套 `.ioc` 的 `Mcu.Name` 均为 `STM32F103Z(C-D-E)Tx`。
+> **直接照抄到 G474 会编译失败或行为异常。**
+>
+> 移植要点：
+>
+> | 项目 | F103（参考代码） | G474（本项目） |
+> |---|---|---|
+> | HAL 头文件 | `stm32f1xx_hal*.h` | `stm32g4xx_hal*.h` |
+> | 时钟树 | 72MHz | 170MHz，需重配 |
+> | GPIO 初始化 | `__HAL_RCC_GPIOx_CLK_ENABLE` 写法相同 | 同 |
+> | SPI 实例 | SPI1/2 | G474 的 SPI 引脚映射不同，**必须用 CubeMX 重新分配** |
+> | I²C 时序 | 软件延时基于 72MHz | **延时参数需按 170MHz 重算** |
+>
+> **建议做法**：用 CubeMX 新建 G474VE 工程、配好 SPI/I²C 与时钟，
+> 再把 `SEEKFREE_ICM20602.c` 的**寄存器操作部分**（与 MCU 无关）搬过去，
+> 底层读写函数按 G474 的 HAL 重写。
+>
+> 注意 [docs/03](../../docs/03-电控与驱动系统.md) 已指出：
+> **IMU 应挂在 SPI2**（SPI1 的 PA6/PA7 与编码器 TIM3 冲突）。
 
 ## 关键实现要点
 
