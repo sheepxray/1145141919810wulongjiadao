@@ -120,3 +120,6 @@ _*.log
 *.uvguix.*
 MDK-ARM/*/
 firmware/stm32/wulong_fw/MDK-ARM/wulong_fw/
+
+# ---- Keil 命令行构建日志（每次构建重新生成）----
+build_log*.txt
