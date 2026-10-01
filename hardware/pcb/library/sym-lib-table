@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "wulong_modules")(type "KiCad")(uri "${KIPRJMOD}/wulong_modules.kicad_sym")(options "")(descr "乌龙驾到模块级符号库"))
+  (lib (name "wulong_foundation")(type "KiCad")(uri "${KIPRJMOD}/wulong_foundation.kicad_sym")(options "")(descr "乌龙驾到基础器件符号库"))
+)

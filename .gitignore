@@ -102,3 +102,21 @@ hardware/electrical/datasheets/
 # 形如 _q10.txt / _sec01.txt / _pb.txt 的片段文件不应入库
 _*.txt
 _*.log
+
+# ---- MDK-ARM / Keil 构建产物（不入库，由本地编译生成）----
+*.o
+*.d
+*.crf
+*.axf
+*.lnp
+*.dep
+*.htm
+*.iex
+*.lst
+*.map
+*.bak
+*.scvd
+*.build_log.htm
+*.uvguix.*
+MDK-ARM/*/
+firmware/stm32/wulong_fw/MDK-ARM/wulong_fw/

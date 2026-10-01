@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "wulong_modules")(type "KiCad")(uri "${KIPRJMOD}/wulong_modules.pretty")(options "")(descr "乌龙驾到模块级封装库"))
+  (lib (name "wulong_foundation")(type "KiCad")(uri "${KIPRJMOD}/wulong_foundation.pretty")(options "")(descr "乌龙驾到基础器件封装库"))
+)

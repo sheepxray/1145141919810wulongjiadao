@@ -128,7 +128,7 @@ firmware/stm32/
 
 | 接口 | 用途 |
 |---|---|
-| USART1 (PA14/PA15) | 调试串口，接 USB-TTL |
+| USART1 (**PC4/PC5**) | 调试串口，接 USB-TTL（原写 PA14/PA15，PA14 是 SWCLK） |
 | SWD | 下载 + 实时变量观察 |
 
 ⚠️ **不要用带蓝牙/WiFi 的模块做"临时调试"** —— C11 禁止遥控，

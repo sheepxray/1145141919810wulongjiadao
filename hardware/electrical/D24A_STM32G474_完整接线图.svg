@@ -1,0 +1,314 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2640" height="2070" viewBox="0 0 2640 2070">
+  <defs>
+    <style>
+      .title{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:48px;font-weight:700;fill:#10212f}
+      .sub{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:21px;fill:#52606d}
+      .panel-title{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:28px;font-weight:700;fill:#10212f}
+      .group{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:19px;font-weight:700;fill:#263442}
+      .pin{font-family:Consolas,"Courier New",monospace;font-size:18px;font-weight:700;fill:#10212f}
+      .func{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:14px;fill:#52606d}
+      .wire{font-family:Consolas,"Courier New",monospace;font-size:16px;fill:#263442}
+      .note{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:18px;fill:#263442}
+      .warn{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:19px;font-weight:700;fill:#a72f24}
+      .small{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:14px;fill:#52606d}
+      .motor{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:18px;font-weight:700;fill:#10212f}
+    </style>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 z" fill="#3b9b62"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 z" fill="#d57a1f"/>
+    </marker>
+    <marker id="arrow-gold" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 z" fill="#b58a16"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 z" fill="#496fc0"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 z" fill="#b33a30"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 z" fill="#52606d"/>
+    </marker>
+  </defs>
+
+  <rect width="2640" height="2070" fill="#f7f9fb"/>
+  <text x="70" y="64" class="title">D24A ↔ STM32G474VET6 完整接线图</text>
+  <text x="72" y="102" class="sub">4×MG513X + 4 路 PWM + 8 路方向 + 4 路编码器 + STBY + ADC + GND</text>
+
+  <rect x="70" y="125" width="2440" height="58" rx="9" fill="#fff1ef" stroke="#d94b3d" stroke-width="2"/>
+  <text x="96" y="162" class="warn">STBY 由 PC6 控制时，必须拔掉 D24A 上 3V3–STBY 跳线帽。官方 F103 接线图不可直接照抄。</text>
+
+  <!-- STM32 board -->
+  <rect x="60" y="205" width="800" height="1460" rx="18" fill="#ffffff" stroke="#b9c6d2" stroke-width="3"/>
+  <rect x="60" y="205" width="800" height="70" rx="18" fill="#e8f0f8"/>
+  <text x="92" y="249" class="panel-title">STM32G474VET6 DevEBox M 板</text>
+  <text x="92" y="300" class="small">左侧文字 = STM32 端口与复用功能</text>
+
+  <!-- D24A board -->
+  <rect x="1720" y="205" width="660" height="1460" rx="18" fill="#ffffff" stroke="#b9c6d2" stroke-width="3"/>
+  <rect x="1720" y="205" width="660" height="70" rx="18" fill="#e9f5ec"/>
+  <text x="1752" y="249" class="panel-title">WHEELTEC D24A</text>
+  <text x="1752" y="300" class="small">右侧文字 = D24A 排针丝印位置</text>
+
+  <!-- group headers -->
+  <rect x="86" y="326" width="746" height="36" rx="7" fill="#e5f4e8"/>
+  <text x="104" y="351" class="group">电机 A · J4 右侧列</text>
+  <rect x="1746" y="326" width="606" height="36" rx="7" fill="#e5f4e8"/>
+  <text x="1766" y="351" class="group">A 路：PWM + 方向 + E1 编码器</text>
+
+  <!-- A rows -->
+  <g>
+    <rect x="96" y="382" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="112" y="407" class="pin">PA8</text><text x="184" y="406" class="func">TIM1_CH1 · PWM</text>
+    <line x1="416" y1="401" x2="1760" y2="401" stroke="#3b9b62" stroke-width="5" marker-end="url(#arrow-green)"/>
+    <text x="842" y="392" class="wire">PWMA · 10 kHz</text>
+    <rect x="1760" y="382" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="1782" y="407" class="pin">J4-R2  PWMA</text>
+  </g>
+  <g>
+    <rect x="96" y="432" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="112" y="457" class="pin">PB0</text><text x="184" y="456" class="func">GPIO · AIN1</text>
+    <line x1="416" y1="451" x2="1760" y2="451" stroke="#3b9b62" stroke-width="4" marker-end="url(#arrow-green)"/>
+    <text x="842" y="442" class="wire">AIN1</text>
+    <rect x="1760" y="432" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="1782" y="457" class="pin">J4-R4  AIN1</text>
+  </g>
+  <g>
+    <rect x="96" y="482" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="112" y="507" class="pin">PB1</text><text x="184" y="506" class="func">GPIO · AIN2</text>
+    <line x1="416" y1="501" x2="1760" y2="501" stroke="#3b9b62" stroke-width="4" marker-end="url(#arrow-green)"/>
+    <text x="842" y="492" class="wire">AIN2</text>
+    <rect x="1760" y="482" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="1782" y="507" class="pin">J4-R3  AIN2</text>
+  </g>
+  <g>
+    <rect x="96" y="532" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="112" y="557" class="pin">PA0</text><text x="184" y="556" class="func">TIM2_CH1 · 编码器</text>
+    <line x1="1760" y1="551" x2="416" y2="551" stroke="#3b9b62" stroke-width="4" marker-end="url(#arrow-green)"/>
+    <text x="842" y="542" class="wire">E1A · 编码器反馈</text>
+    <rect x="1760" y="532" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="1782" y="557" class="pin">J4-R5  E1A</text>
+  </g>
+  <g>
+    <rect x="96" y="582" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="112" y="607" class="pin">PA1</text><text x="184" y="606" class="func">TIM2_CH2 · 编码器</text>
+    <line x1="1760" y1="601" x2="416" y2="601" stroke="#3b9b62" stroke-width="4" marker-end="url(#arrow-green)"/>
+    <text x="842" y="592" class="wire">E1B · 编码器反馈</text>
+    <rect x="1760" y="582" width="320" height="38" rx="6" fill="#e9f6ee" stroke="#4f9c68"/>
+    <text x="1782" y="607" class="pin">J4-R6  E1B</text>
+  </g>
+
+  <!-- B header -->
+  <rect x="86" y="650" width="746" height="36" rx="7" fill="#fff0df"/>
+  <text x="104" y="675" class="group">电机 B · J4 左侧列</text>
+  <rect x="1746" y="650" width="606" height="36" rx="7" fill="#fff0df"/>
+  <text x="1766" y="675" class="group">B 路：PWM + 方向 + E2 编码器</text>
+
+  <!-- B rows -->
+  <g>
+    <rect x="96" y="706" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="112" y="731" class="pin">PA9</text><text x="184" y="730" class="func">TIM1_CH2 · PWM</text>
+    <line x1="416" y1="725" x2="1760" y2="725" stroke="#d57a1f" stroke-width="5" marker-end="url(#arrow-orange)"/>
+    <text x="842" y="716" class="wire">PWMB · 10 kHz</text>
+    <rect x="1760" y="706" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="1782" y="731" class="pin">J4-L2  PWMB</text>
+  </g>
+  <g>
+    <rect x="96" y="756" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="112" y="781" class="pin">PE4</text><text x="184" y="780" class="func">GPIO · BIN1</text>
+    <line x1="416" y1="775" x2="1760" y2="775" stroke="#d57a1f" stroke-width="4" marker-end="url(#arrow-orange)"/>
+    <text x="842" y="766" class="wire">BIN1</text>
+    <rect x="1760" y="756" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="1782" y="781" class="pin">J4-L4  BIN1</text>
+  </g>
+  <g>
+    <rect x="96" y="806" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="112" y="831" class="pin">PE5</text><text x="184" y="830" class="func">GPIO · BIN2</text>
+    <line x1="416" y1="825" x2="1760" y2="825" stroke="#d57a1f" stroke-width="4" marker-end="url(#arrow-orange)"/>
+    <text x="842" y="816" class="wire">BIN2</text>
+    <rect x="1760" y="806" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="1782" y="831" class="pin">J4-L3  BIN2</text>
+  </g>
+  <g>
+    <rect x="96" y="856" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="112" y="881" class="pin">PA6</text><text x="184" y="880" class="func">TIM3_CH1 · 编码器</text>
+    <line x1="1760" y1="875" x2="416" y2="875" stroke="#d57a1f" stroke-width="4" marker-end="url(#arrow-orange)"/>
+    <text x="842" y="866" class="wire">E2A · 编码器反馈</text>
+    <rect x="1760" y="856" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="1782" y="881" class="pin">J4-L5  E2A</text>
+  </g>
+  <g>
+    <rect x="96" y="906" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="112" y="931" class="pin">PA7</text><text x="184" y="930" class="func">TIM3_CH2 · 编码器</text>
+    <line x1="1760" y1="925" x2="416" y2="925" stroke="#d57a1f" stroke-width="4" marker-end="url(#arrow-orange)"/>
+    <text x="842" y="916" class="wire">E2B · 编码器反馈</text>
+    <rect x="1760" y="906" width="320" height="38" rx="6" fill="#fff3e4" stroke="#d58a31"/>
+    <text x="1782" y="931" class="pin">J4-L6  E2B</text>
+  </g>
+
+  <!-- C header -->
+  <rect x="86" y="974" width="746" height="36" rx="7" fill="#faf0c9"/>
+  <text x="104" y="999" class="group">电机 C · J6 右侧列</text>
+  <rect x="1746" y="974" width="606" height="36" rx="7" fill="#faf0c9"/>
+  <text x="1766" y="999" class="group">C 路：PWM + 方向 + E3 编码器</text>
+
+  <!-- C rows -->
+  <g>
+    <rect x="96" y="1030" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="112" y="1055" class="pin">PA10</text><text x="184" y="1054" class="func">TIM1_CH3 · PWM</text>
+    <line x1="416" y1="1049" x2="1760" y2="1049" stroke="#b58a16" stroke-width="5" marker-end="url(#arrow-gold)"/>
+    <text x="842" y="1040" class="wire">PWMC · 10 kHz</text>
+    <rect x="1760" y="1030" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="1782" y="1055" class="pin">J6-R2  PWMC</text>
+  </g>
+  <g>
+    <rect x="96" y="1080" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="112" y="1105" class="pin">PB10</text><text x="184" y="1104" class="func">GPIO · CIN1</text>
+    <line x1="416" y1="1099" x2="1760" y2="1099" stroke="#b58a16" stroke-width="4" marker-end="url(#arrow-gold)"/>
+    <text x="842" y="1090" class="wire">CIN1</text>
+    <rect x="1760" y="1080" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="1782" y="1105" class="pin">J6-R4  CIN1</text>
+  </g>
+  <g>
+    <rect x="96" y="1130" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="112" y="1155" class="pin">PB11</text><text x="184" y="1154" class="func">GPIO · CIN2</text>
+    <line x1="416" y1="1149" x2="1760" y2="1149" stroke="#b58a16" stroke-width="4" marker-end="url(#arrow-gold)"/>
+    <text x="842" y="1140" class="wire">CIN2</text>
+    <rect x="1760" y="1130" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="1782" y="1155" class="pin">J6-R3  CIN2</text>
+  </g>
+  <g>
+    <rect x="96" y="1180" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="112" y="1205" class="pin">PB6</text><text x="184" y="1204" class="func">TIM4_CH1 · 编码器</text>
+    <line x1="1760" y1="1199" x2="416" y2="1199" stroke="#b58a16" stroke-width="4" marker-end="url(#arrow-gold)"/>
+    <text x="842" y="1190" class="wire">E3A · 编码器反馈</text>
+    <rect x="1760" y="1180" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="1782" y="1205" class="pin">J6-R5  E3A</text>
+  </g>
+  <g>
+    <rect x="96" y="1230" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="112" y="1255" class="pin">PB7</text><text x="184" y="1254" class="func">TIM4_CH2 · 编码器</text>
+    <line x1="1760" y1="1249" x2="416" y2="1249" stroke="#b58a16" stroke-width="4" marker-end="url(#arrow-gold)"/>
+    <text x="842" y="1240" class="wire">E3B · 编码器反馈</text>
+    <rect x="1760" y="1230" width="320" height="38" rx="6" fill="#fbf3d5" stroke="#b78e1e"/>
+    <text x="1782" y="1255" class="pin">J6-R6  E3B</text>
+  </g>
+
+  <!-- D header -->
+  <rect x="86" y="1298" width="746" height="36" rx="7" fill="#e7edfb"/>
+  <text x="104" y="1323" class="group">电机 D · J6 左侧列</text>
+  <rect x="1746" y="1298" width="606" height="36" rx="7" fill="#e7edfb"/>
+  <text x="1766" y="1323" class="group">D 路：PWM + 方向 + E4 编码器</text>
+
+  <!-- D rows -->
+  <g>
+    <rect x="96" y="1354" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="112" y="1379" class="pin">PA11</text><text x="184" y="1378" class="func">TIM1_CH4 · PWM</text>
+    <line x1="416" y1="1373" x2="1760" y2="1373" stroke="#496fc0" stroke-width="5" marker-end="url(#arrow-blue)"/>
+    <text x="842" y="1364" class="wire">PWMD · 10 kHz</text>
+    <rect x="1760" y="1354" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="1782" y="1379" class="pin">J6-L2  PWMD</text>
+  </g>
+  <g>
+    <rect x="96" y="1404" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="112" y="1429" class="pin">PD2</text><text x="184" y="1428" class="func">GPIO · DIN1</text>
+    <line x1="416" y1="1423" x2="1760" y2="1423" stroke="#496fc0" stroke-width="4" marker-end="url(#arrow-blue)"/>
+    <text x="842" y="1414" class="wire">DIN1</text>
+    <rect x="1760" y="1404" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="1782" y="1429" class="pin">J6-L4  DIN1</text>
+  </g>
+  <g>
+    <rect x="96" y="1454" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="112" y="1479" class="pin">PC12</text><text x="184" y="1478" class="func">GPIO · DIN2</text>
+    <line x1="416" y1="1473" x2="1760" y2="1473" stroke="#496fc0" stroke-width="4" marker-end="url(#arrow-blue)"/>
+    <text x="842" y="1464" class="wire">DIN2</text>
+    <rect x="1760" y="1454" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="1782" y="1479" class="pin">J6-L3  DIN2</text>
+  </g>
+  <g>
+    <rect x="96" y="1504" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="112" y="1529" class="pin">PE2</text><text x="184" y="1528" class="func">TIM20_CH1 · 编码器</text>
+    <line x1="1760" y1="1523" x2="416" y2="1523" stroke="#496fc0" stroke-width="4" marker-end="url(#arrow-blue)"/>
+    <text x="842" y="1514" class="wire">E4A · 编码器反馈</text>
+    <rect x="1760" y="1504" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="1782" y="1529" class="pin">J6-L5  E4A</text>
+  </g>
+  <g>
+    <rect x="96" y="1554" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="112" y="1579" class="pin">PE3</text><text x="184" y="1578" class="func">TIM20_CH2 · 编码器</text>
+    <line x1="1760" y1="1573" x2="416" y2="1573" stroke="#496fc0" stroke-width="4" marker-end="url(#arrow-blue)"/>
+    <text x="842" y="1564" class="wire">E4B · 编码器反馈</text>
+    <rect x="1760" y="1554" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="1782" y="1579" class="pin">J6-L6  E4B</text>
+  </g>
+
+  <!-- shared signals -->
+  <rect x="86" y="1622" width="746" height="36" rx="7" fill="#f1f3f5"/>
+  <text x="104" y="1647" class="group">公共：STBY · ADC · GND</text>
+  <rect x="1746" y="1622" width="606" height="36" rx="7" fill="#f1f3f5"/>
+  <text x="1766" y="1647" class="group">共享控制与监测</text>
+
+  <g>
+    <rect x="96" y="1678" width="320" height="38" rx="6" fill="#fff0ef" stroke="#bd4b42"/>
+    <text x="112" y="1703" class="pin">PC6</text><text x="184" y="1702" class="func">GPIO · STBY 软急停</text>
+    <line x1="416" y1="1697" x2="1760" y2="1697" stroke="#b33a30" stroke-width="4" marker-end="url(#arrow-red)"/>
+    <text x="842" y="1688" class="wire">STBY · 高电平使能</text>
+    <rect x="1760" y="1678" width="320" height="38" rx="6" fill="#fff0ef" stroke="#bd4b42"/>
+    <text x="1782" y="1703" class="pin">J4-R1  STBY</text>
+  </g>
+  <g>
+    <rect x="96" y="1728" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="112" y="1753" class="pin">PA4</text><text x="184" y="1752" class="func">ADC2_IN17 · 电池电压</text>
+    <line x1="1760" y1="1747" x2="416" y2="1747" stroke="#496fc0" stroke-width="4" marker-end="url(#arrow-blue)"/>
+    <text x="842" y="1738" class="wire">ADC · 1/11 分压</text>
+    <rect x="1760" y="1728" width="320" height="38" rx="6" fill="#edf2fd" stroke="#5877bf"/>
+    <text x="1782" y="1753" class="pin">J6-L1  ADC</text>
+  </g>
+  <g>
+    <rect x="96" y="1778" width="320" height="38" rx="6" fill="#f1f3f5" stroke="#52606d"/>
+    <text x="112" y="1803" class="pin">GND</text><text x="184" y="1802" class="func">所有模块公共地</text>
+    <line x1="416" y1="1797" x2="1760" y2="1797" stroke="#52606d" stroke-width="4" marker-end="url(#arrow-gray)"/>
+    <text x="842" y="1788" class="wire">GND · 必须共地</text>
+    <rect x="1760" y="1778" width="320" height="38" rx="6" fill="#f1f3f5" stroke="#52606d"/>
+    <text x="1782" y="1803" class="pin">GND / J6-R1</text>
+  </g>
+
+  <!-- power and motor section -->
+  <rect x="70" y="1830" width="2440" height="62" rx="10" fill="#ffffff" stroke="#c7d1da" stroke-width="2"/>
+  <text x="96" y="1868" class="note">3S 电池 → D24A <tspan font-weight="700">Vin+ / Vin-</tspan>　|　D24A <tspan font-weight="700">Motor_A/B/C/D</tspan> → 4×MG513X 电机与霍尔编码器　|　调试期：Type-C 给 G474，D24A 只接电池，两板只共地</text>
+
+  <!-- right side motor connections -->
+  <rect x="2410" y="300" width="190" height="760" rx="16" fill="#ffffff" stroke="#c7d1da" stroke-width="2"/>
+  <text x="2432" y="340" class="panel-title" font-size="24">功率侧</text>
+  <text x="2432" y="372" class="small">D24A 电机输出</text>
+
+  <circle cx="2505" cy="440" r="44" fill="#e9f6ee" stroke="#4f9c68" stroke-width="3"/>
+  <text x="2482" y="447" class="motor">A</text>
+  <text x="2440" y="510" class="small">Motor_A</text>
+  <line x1="2380" y1="440" x2="2460" y2="440" stroke="#3b9b62" stroke-width="5" marker-end="url(#arrow-green)"/>
+
+  <circle cx="2505" cy="590" r="44" fill="#fff3e4" stroke="#d58a31" stroke-width="3"/>
+  <text x="2482" y="597" class="motor">B</text>
+  <text x="2440" y="660" class="small">Motor_B</text>
+  <line x1="2380" y1="590" x2="2460" y2="590" stroke="#d57a1f" stroke-width="5" marker-end="url(#arrow-orange)"/>
+
+  <circle cx="2505" cy="740" r="44" fill="#fbf3d5" stroke="#b78e1e" stroke-width="3"/>
+  <text x="2482" y="747" class="motor">C</text>
+  <text x="2440" y="810" class="small">Motor_C</text>
+  <line x1="2380" y1="740" x2="2460" y2="740" stroke="#b58a16" stroke-width="5" marker-end="url(#arrow-gold)"/>
+
+  <circle cx="2505" cy="890" r="44" fill="#edf2fd" stroke="#5877bf" stroke-width="3"/>
+  <text x="2482" y="897" class="motor">D</text>
+  <text x="2440" y="960" class="small">Motor_D</text>
+  <line x1="2380" y1="890" x2="2460" y2="890" stroke="#496fc0" stroke-width="5" marker-end="url(#arrow-blue)"/>
+
+  <!-- optional power note moved below the wiring area so no pin label is covered -->
+  <rect x="70" y="1910" width="2440" height="130" rx="12" fill="#fffaf0" stroke="#d8a84e" stroke-width="2"/>
+  <text x="96" y="1950" class="warn">供电二选一，绝不能并联</text>
+  <text x="96" y="1986" class="note">调试：Type-C → G474，D24A 只接 3S 电池。</text>
+  <text x="820" y="1986" class="note">整机：D24A 5V → G474 5V，或 D24A 3V3 → G474 3V3。</text>
+  <text x="1600" y="1986" class="note">PWLINK2：只接 SWD + VREF + GND，不接 5V。</text>
+  <text x="96" y="2022" class="small">K230D 与相机仍使用独立 DC-DC 5V，不从 D24A 的 5V/3V3 取电。所有 GND 单点星型汇流。</text>
+</svg>

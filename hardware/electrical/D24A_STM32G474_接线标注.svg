@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1320" viewBox="0 0 1800 1320">
+  <defs>
+    <style>
+      .title{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:42px;font-weight:700;fill:#15202b}
+      .sub{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:20px;fill:#52606d}
+      .h{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:24px;font-weight:700;fill:#15202b}
+      .h2{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:19px;font-weight:700;fill:#15202b}
+      .t{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:18px;fill:#24313d}
+      .t2{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:16px;fill:#52606d}
+      .mono{font-family:Consolas,"Courier New",monospace;font-size:18px;fill:#15202b}
+      .monob{font-family:Consolas,"Courier New",monospace;font-size:19px;font-weight:700;fill:#15202b}
+      .warn{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:20px;font-weight:700;fill:#9d2b20}
+      .pin{font-family:Consolas,"Courier New",monospace;font-size:15px;fill:#ffffff}
+      .small{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:14px;fill:#52606d}
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1800" height="1320" fill="#f7f9fb"/>
+  <text x="70" y="62" class="title">D24A ↔ STM32G474VET6 对应连线</text>
+  <text x="72" y="98" class="sub">按本项目实际方案标注：4×MG513X + D24A 四路驱动 + STM32G474VET6（LQFP100）</text>
+  <rect x="70" y="116" width="1660" height="56" rx="8" fill="#fff1ef" stroke="#d94b3d" stroke-width="2"/>
+  <text x="92" y="152" class="warn">注意：官方资料包里的 STM32F103RCT6 接线图不能照抄；此图已把 STM32 侧全部改成 G474。</text>
+
+  <!-- D24A J4 A/B -->
+  <rect x="70" y="200" width="520" height="420" rx="12" fill="#ffffff" stroke="#cad3dc" stroke-width="2"/>
+  <text x="92" y="238" class="h">D24A · J4 · 电机 A / B 排针（2×6）</text>
+  <text x="92" y="268" class="t2">面对板上丝印看：左列 / 右列，从上到下。</text>
+
+  <rect x="100" y="294" width="205" height="42" rx="6" fill="#e7f5ea" stroke="#4c9a5c"/>
+  <text x="116" y="321" class="monob">L1  3V3</text>
+  <rect x="330" y="294" width="205" height="42" rx="6" fill="#e7f5ea" stroke="#4c9a5c"/>
+  <text x="346" y="321" class="monob">R1  STBY</text>
+
+  <rect x="100" y="348" width="205" height="42" rx="6" fill="#fff0d8" stroke="#d68a22"/>
+  <text x="116" y="375" class="monob">L2  PWMB</text>
+  <rect x="330" y="348" width="205" height="42" rx="6" fill="#e5f3e8" stroke="#4c9a5c"/>
+  <text x="346" y="375" class="monob">R2  PWMA</text>
+
+  <rect x="100" y="402" width="205" height="42" rx="6" fill="#fff0d8" stroke="#d68a22"/>
+  <text x="116" y="429" class="monob">L3  BIN2</text>
+  <rect x="330" y="402" width="205" height="42" rx="6" fill="#e5f3e8" stroke="#4c9a5c"/>
+  <text x="346" y="429" class="monob">R3  AIN2</text>
+
+  <rect x="100" y="456" width="205" height="42" rx="6" fill="#fff0d8" stroke="#d68a22"/>
+  <text x="116" y="483" class="monob">L4  BIN1</text>
+  <rect x="330" y="456" width="205" height="42" rx="6" fill="#e5f3e8" stroke="#4c9a5c"/>
+  <text x="346" y="483" class="monob">R4  AIN1</text>
+
+  <rect x="100" y="510" width="205" height="42" rx="6" fill="#fff0d8" stroke="#d68a22"/>
+  <text x="116" y="537" class="monob">L5  E2A</text>
+  <rect x="330" y="510" width="205" height="42" rx="6" fill="#e5f3e8" stroke="#4c9a5c"/>
+  <text x="346" y="537" class="monob">R5  E1A</text>
+
+  <rect x="100" y="564" width="205" height="42" rx="6" fill="#fff0d8" stroke="#d68a22"/>
+  <text x="116" y="591" class="monob">L6  E2B</text>
+  <rect x="330" y="564" width="205" height="42" rx="6" fill="#e5f3e8" stroke="#4c9a5c"/>
+  <text x="346" y="591" class="monob">R6  E1B</text>
+
+  <!-- D24A J6 C/D -->
+  <rect x="620" y="200" width="520" height="420" rx="12" fill="#ffffff" stroke="#cad3dc" stroke-width="2"/>
+  <text x="642" y="238" class="h">D24A · J6 · 电机 C / D 排针（2×6）</text>
+  <text x="642" y="268" class="t2">面向板上丝印看：左列 / 右列，从上到下。</text>
+
+  <rect x="650" y="294" width="205" height="42" rx="6" fill="#e8eefc" stroke="#4c6fbd"/>
+  <text x="666" y="321" class="monob">L1  ADC</text>
+  <rect x="880" y="294" width="205" height="42" rx="6" fill="#e8eefc" stroke="#4c6fbd"/>
+  <text x="896" y="321" class="monob">R1  GND</text>
+
+  <rect x="650" y="348" width="205" height="42" rx="6" fill="#e8eefc" stroke="#4c6fbd"/>
+  <text x="666" y="375" class="monob">L2  PWMD</text>
+  <rect x="880" y="348" width="205" height="42" rx="6" fill="#f7e8a8" stroke="#b18a12"/>
+  <text x="896" y="375" class="monob">R2  PWMC</text>
+
+  <rect x="650" y="402" width="205" height="42" rx="6" fill="#e8eefc" stroke="#4c6fbd"/>
+  <text x="666" y="429" class="monob">L3  DIN2</text>
+  <rect x="880" y="402" width="205" height="42" rx="6" fill="#f7e8a8" stroke="#b18a12"/>
+  <text x="896" y="429" class="monob">R3  CIN2</text>
+
+  <rect x="650" y="456" width="205" height="42" rx="6" fill="#e8eefc" stroke="#4c6fbd"/>
+  <text x="666" y="483" class="monob">L4  DIN1</text>
+  <rect x="880" y="456" width="205" height="42" rx="6" fill="#f7e8a8" stroke="#b18a12"/>
+  <text x="896" y="483" class="monob">R4  CIN1</text>
+
+  <rect x="650" y="510" width="205" height="42" rx="6" fill="#e8eefc" stroke="#4c6fbd"/>
+  <text x="666" y="537" class="monob">L5  E4A</text>
+  <rect x="880" y="510" width="205" height="42" rx="6" fill="#f7e8a8" stroke="#b18a12"/>
+  <text x="896" y="537" class="monob">R5  E3A</text>
+
+  <rect x="650" y="564" width="205" height="42" rx="6" fill="#e8eefc" stroke="#4c6fbd"/>
+  <text x="666" y="591" class="monob">L6  E4B</text>
+  <rect x="880" y="564" width="205" height="42" rx="6" fill="#f7e8a8" stroke="#b18a12"/>
+  <text x="896" y="591" class="monob">R6  E3B</text>
+
+  <!-- STM32 summary -->
+  <rect x="1170" y="200" width="560" height="420" rx="12" fill="#ffffff" stroke="#cad3dc" stroke-width="2"/>
+  <text x="1192" y="238" class="h">STM32G474VET6 · 关键端口</text>
+  <line x1="1192" y1="256" x2="1708" y2="256" stroke="#dfe5eb" stroke-width="2"/>
+  <text x="1192" y="292" class="monob">PWM：PA8 / PA9 / PA10 / PA11</text>
+  <text x="1192" y="328" class="monob">A方向：PB0 / PB1</text>
+  <text x="1192" y="364" class="monob">B方向：PE4 / PE5</text>
+  <text x="1192" y="400" class="monob">C方向：PB10 / PB11</text>
+  <text x="1192" y="436" class="monob">D方向：PD2 / PC12</text>
+  <text x="1192" y="472" class="monob">编码器：PA0/1 · PA6/7 · PB6/7 · PE2/3</text>
+  <text x="1192" y="508" class="monob">STBY：PC6</text>
+  <text x="1192" y="544" class="monob">电池ADC：PA4</text>
+  <text x="1192" y="580" class="monob">调试串口：PC4(TX) / PC5(RX)</text>
+
+  <!-- Mapping cards -->
+  <rect x="70" y="650" width="820" height="250" rx="12" fill="#ffffff" stroke="#4c9a5c" stroke-width="3"/>
+  <rect x="70" y="650" width="820" height="52" rx="12" fill="#e7f5ea"/>
+  <text x="94" y="684" class="h">电机 A（绿色）</text>
+  <text x="94" y="732" class="monob">D24A J4-R2  PWMA   →   STM32 PA8</text>
+  <text x="94" y="770" class="monob">D24A J4-R4  AIN1   →   STM32 PB0</text>
+  <text x="94" y="808" class="monob">D24A J4-R3  AIN2   →   STM32 PB1</text>
+  <text x="94" y="846" class="monob">D24A J4-R5  E1A    →   STM32 PA0</text>
+  <text x="94" y="884" class="monob">D24A J4-R6  E1B    →   STM32 PA1</text>
+
+  <rect x="910" y="650" width="820" height="250" rx="12" fill="#ffffff" stroke="#d68a22" stroke-width="3"/>
+  <rect x="910" y="650" width="820" height="52" rx="12" fill="#fff0d8"/>
+  <text x="934" y="684" class="h">电机 B（橙色）</text>
+  <text x="934" y="732" class="monob">D24A J4-L2  PWMB   →   STM32 PA9</text>
+  <text x="934" y="770" class="monob">D24A J4-L4  BIN1   →   STM32 PE4</text>
+  <text x="934" y="808" class="monob">D24A J4-L3  BIN2   →   STM32 PE5</text>
+  <text x="934" y="846" class="monob">D24A J4-L5  E2A    →   STM32 PA6</text>
+  <text x="934" y="884" class="monob">D24A J4-L6  E2B    →   STM32 PA7</text>
+
+  <rect x="70" y="920" width="820" height="250" rx="12" fill="#ffffff" stroke="#b18a12" stroke-width="3"/>
+  <rect x="70" y="920" width="820" height="52" rx="12" fill="#f7e8a8"/>
+  <text x="94" y="954" class="h">电机 C（黄色）</text>
+  <text x="94" y="1002" class="monob">D24A J6-R2  PWMC   →   STM32 PA10</text>
+  <text x="94" y="1040" class="monob">D24A J6-R4  CIN1   →   STM32 PB10</text>
+  <text x="94" y="1078" class="monob">D24A J6-R3  CIN2   →   STM32 PB11</text>
+  <text x="94" y="1116" class="monob">D24A J6-R5  E3A    →   STM32 PB6</text>
+  <text x="94" y="1154" class="monob">D24A J6-R6  E3B    →   STM32 PB7</text>
+
+  <rect x="910" y="920" width="820" height="250" rx="12" fill="#ffffff" stroke="#4c6fbd" stroke-width="3"/>
+  <rect x="910" y="920" width="820" height="52" rx="12" fill="#e8eefc"/>
+  <text x="934" y="954" class="h">电机 D（蓝色）</text>
+  <text x="934" y="1002" class="monob">D24A J6-L2  PWMD   →   STM32 PA11</text>
+  <text x="934" y="1040" class="monob">D24A J6-L4  DIN1   →   STM32 PD2</text>
+  <text x="934" y="1078" class="monob">D24A J6-L3  DIN2   →   STM32 PC12</text>
+  <text x="934" y="1116" class="monob">D24A J6-L5  E4A    →   STM32 PE2</text>
+  <text x="934" y="1154" class="monob">D24A J6-L6  E4B    →   STM32 PE3</text>
+
+  <!-- Shared signals -->
+  <rect x="70" y="1192" width="1660" height="94" rx="12" fill="#ffffff" stroke="#cad3dc" stroke-width="2"/>
+  <text x="94" y="1224" class="h2">公共 / 电源</text>
+  <text x="700" y="1224" class="warn" font-size="18">STBY 用 PC6 控制时，必须拔掉 D24A 的 3V3–STBY 跳线帽！</text>
+  <text x="94" y="1258" class="monob">STBY：D24A J4-R1 → STM32 PC6（高电平使能，低电平软急停）</text>
+  <text x="700" y="1258" class="monob">ADC：D24A J6-L1 → STM32 PA4（1/11 分压）</text>
+  <text x="1240" y="1258" class="monob">GND：D24A GND / J6-R1 ↔ STM32 GND（必须共地）</text>
+  <text x="94" y="1286" class="small">供电二选一：D24A 5V → G474 5V，或 D24A 3V3 → G474 3V3。不要同时接两路电源。K230D 仍走独立 DC-DC 5V。</text>
+</svg>
