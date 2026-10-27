@@ -54,6 +54,10 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
+/* Firmware identity, printed at boot so the running image can be confirmed
+ * from the debug UART.  Bump when the interface changes. */
+#define WULONG_FW_TAG  "wulong-fw 2026-10-23 k1-vision"
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

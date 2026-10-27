@@ -113,7 +113,10 @@ void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
-
+  /* Byte-wise RX interrupt is sufficient for the low-rate CRC protocol
+   * (20 frames/s, 13 bytes/frame).  DMA remains available for future use. */
+  HAL_NVIC_SetPriority(USART2_IRQn, 6, 0);
+  HAL_NVIC_EnableIRQ(USART2_IRQn);
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -152,6 +155,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    /* USART1 RX is interrupt-driven (see HAL_UART_RxCpltCallback in main.c).
+     * The old 2 ms blocking poll could not keep up with 115200 baud and
+     * silently dropped almost every byte, so console commands looked dead.
+     * Priority 6 is numerically below FreeRTOS max-syscall (5), so the
+     * callback may use FreeRTOS APIs if it ever needs to. */
+    HAL_NVIC_SetPriority(USART1_IRQn, 6, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
 
   /* USER CODE BEGIN USART1_MspInit 1 */
 

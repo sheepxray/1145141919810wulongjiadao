@@ -64,6 +64,7 @@ Core/Src/stm32g4xx_it.c \
 Core/Src/stm32g4xx_hal_msp.c \
 Core/Src/stm32g4xx_hal_timebase_tim.c \
 Core/Src/wulong_control.c \
+Core/Src/imu.c \
 Core/Src/system_stm32g4xx.c \
 Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c \
 Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc.c \

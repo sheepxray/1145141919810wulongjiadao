@@ -43,7 +43,18 @@ Program Size: Code=17114  RO-data=570  RW-data=132  ZI-data=21972
 
 ## K230D 接线（立创庐山派 Lite-K230D）
 
-GH1.25-4P 座子线序（官方）：`5V / RXD / TXD / GND`
+### 40Pin 排针（本项目 Lite-K230D 已验证）
+
+| K230D 物理脚 | 信号 | 接到 STM32 |
+|---|---|---|
+| Pin 37 | GPIO32 / UART3_TXD | PA3（USART2_RX） |
+| Pin 40 | GPIO33 / UART3_RXD | PA2（USART2_TX） |
+| Pin 39 | GND | GND（必须共地） |
+| Pin 2 / 4 / 17 | 5V0 / 3V3 | 不接（K230D 由独立 DC-DC 供电） |
+
+### GH1.25-4P 座（另一种引出位置）
+
+座子线序（官方）：`5V / RXD / TXD / GND`
 
 | 座子脚 | 信号 | 接到 STM32 |
 |---|---|---|
@@ -52,8 +63,31 @@ GH1.25-4P 座子线序（官方）：`5V / RXD / TXD / GND`
 | 3 | TXD | PA3（USART2_RX） |
 | 4 | GND | GND（必须共地） |
 
-K230D 侧对应 **UART2 = GPIO11(TXD) / GPIO12(RXD)**。
+GH1.25 座对应 **UART2 = GPIO11(TXD) / GPIO12(RXD)**。40Pin 默认使用
+**UART3 = GPIO32(TXD) / GPIO33(RXD)**，该组合已完成 30 帧实机接收验证。
+UART2 的 40Pin 备选为 GPIO05/06，但当前板卡上未作为默认方案。
 ⚠️ **不要用 UART0**（GPIO38/39）——被系统 RT-Smart 占用作调试台。
+
+## K230 视觉接近控制
+
+USART2 已接入 CRC16 帧解析和 `APPROACH_TARGET (0x07)`：
+
+```text
+VA  开启视觉接近
+VS  关闭视觉接近
+VI  查看视觉帧状态
+S   停车并解除
+E   急停
+```
+
+K230 只发送横向误差、目标框高度、置信度和有效位。STM32 在控制任务中以
+1kHz 生成 `vx/omega`：偏差较大时原地转向，接近中央后才前进；默认前进
+上限 `100 mm/s`、转向上限 `350 mrad/s`。目标框高度达到
+`VISION_STOP_SIZE_PM=580` 时停止前进但仍可转向居中。超过 200ms 没有
+有效帧、目标丢失或收到 `S/E` 时都会停车。
+
+物理用户键 `K1`（PD8）已改为启动视觉接近，等价于串口 `VA`。串口命令
+`K1` 仍保留原来的四段轮速诊断序列。`E` 是统一急停。
 
 ## FreeRTOS 接入
 

@@ -89,3 +89,67 @@ nncase 工具链是本项目最大的技术风险（[docs/09](../../docs/09-待�
 K230 必须能回答一个问题：**"如果我完全不工作，车还能不能得分？"**
 
 答案必须是"能" —— STM32 侧的降级策略 B 不依赖视觉识别分值。
+
+## 水罐视觉接近
+
+入口脚本：
+
+```text
+firmware/k230/vision_approach.py
+```
+
+运行前把 `water_can_detect.py` 与 `vision_approach.py` 两个文件都放到 K230
+的 `/sdcard` 目录，`vision_approach.py` 会导入检测器模块。
+
+K230 使用 **UART3**、`921600 8N1` 以 20Hz 发送 `APPROACH_TARGET`。
+40Pin 排针使用 `Pin 37/GPIO32(TXD)` 与 `Pin 40/GPIO33(RXD)`；
+该组合已在实机上完成 30 帧连续接收验证。
+
+UART3 TX 必须显式配置 FPIOA 输出使能：
+
+```python
+fpioa.set_function(32, fpioa.UART3_TXD, ie=1, oe=1, pu=1, pd=0, ds=7)
+fpioa.set_function(33, fpioa.UART3_RXD, ie=1, oe=0, pu=1, pd=0, ds=7)
+```
+
+STM32 负责视觉转向、前进、限速、到距离停车和 200ms 断链停车，K230 不
+直接驱动电机。目标偏离画面中心时优先原地转向，回到中央附近后才前进；
+达到停车尺寸后仍可原地转向保持目标居中。
+
+首次调试顺序：
+
+1. 车轮架空，先烧录包含视觉接近模式的 STM32 固件。
+2. 先运行 `uart3_link_test.py`，不接摄像头；在 USART1 发送 `VI`，
+   确认 `rx_bytes` 和 `frames` 持续增加。
+3. 链路通过后，在 USART1 发送 `VA`，开启视觉接近。
+4. 在 CanMV IDE 运行 `vision_approach.py`，再用 `VI` 检查
+   `valid/err_pm/size_pm/conf/age_ms`。
+5. 确认目标偏左/偏右时的转向方向正确，再把车放地面。
+6. 测出安全停止距离下目标框高度，必要时修改
+   `firmware/stm32/wulong_fw/Core/Src/main.c` 的
+   `VISION_STOP_SIZE_PM`（默认 580）。
+
+安全命令：
+
+```text
+VS   关闭视觉接近
+S    停车并解除控制
+E    急停
+```
+
+默认速度上限为前进 `100 mm/s`、转向 `350 mrad/s`。K230 侧对误差和尺寸
+做低通平滑，并在短暂丢失时保留目标 250ms。第一次实车必须从架空状态验证
+方向，并确保 `E` 急停随时可到达。
+
+### UART2 备选
+
+如果改用 40Pin 的 UART2：
+
+```text
+K230 Pin 11 / GPIO05 / UART2_TXD -> STM32 PA3
+K230 Pin 13 / GPIO06 / UART2_RXD <- STM32 PA2
+K230 Pin 14 / GND                <-> STM32 GND
+```
+
+UART2 引出在当前板卡上未通过实机连续帧验证，默认不使用。UART3 为当前
+已验证方案。
