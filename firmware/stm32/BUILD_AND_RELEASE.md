@@ -134,3 +134,24 @@ sha256sum -c SHA256SUMS.txt
 
 > `Makefile` 与 `.ld` 保留是为了将来若要走 CI 路线时有起点，但**目前不用** ——
 > 用它们构建会因缺 CMSIS 核心头文件而失败。
+
+---
+
+## 7. 发布资产：机械模型（SketchUp）
+
+除固件外，每次发布**一并上传当前权威机械模型**（见 [hardware/mechanical/README.md](../../hardware/mechanical/README.md)）：
+
+| 文件 | 说明 |
+|---|---|
+| `hardware/mechanical/sketchup/底盘_一体_v11.skp` | 当前权威底盘模型；后续改动从此文件起改，版本号递增 |
+
+```sh
+gh release create v1.1.0 \
+  dist/wulong_fw_v1.1.0.hex dist/wulong_fw_v1.1.0.bin \
+  dist/wulong_fw_v1.1.0.elf dist/wulong_fw_v1.1.0.map \
+  dist/SHA256SUMS.txt \
+  hardware/mechanical/sketchup/底盘_一体_v11.skp \
+  --title "固件 v1.1.0" --notes-file dist/release_notes.md
+```
+
+> 给已存在的 Release 追加模型：`gh release upload <tag> hardware/mechanical/sketchup/底盘_一体_v11.skp`

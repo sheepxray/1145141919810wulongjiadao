@@ -5,6 +5,18 @@
 
 ---
 
+## SketchUp 机械模型（权威源文件）
+
+| 文件 | 说明 |
+|---|---|
+| `sketchup/底盘_一体_v11.skp` | **当前权威底盘模型（一体式 v11）**。后续所有机械改动都从此文件起改，版本号递增（v12、v13…） |
+| `sketchup/build_robot.rb` | 早期参数化生成脚本（旧差速方案，仅存档） |
+
+> **规则**：每次机械改动都从 `底盘_一体_v11.skp` 起改；改完提交仓库，并随 GitHub Release 一起分发该 `.skp`。
+> 外部（Codex）可通过 [tools/sketchup_bridge](../../tools/sketchup_bridge/su_bridge.rb) 直接驱动 SketchUp 读写此模型。
+
+---
+
 ## 打印件清单
 
 | # | 件名 | 材料 | 层高 | 填充 | 关键尺寸 | 备注 |
