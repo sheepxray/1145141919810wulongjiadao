@@ -45,6 +45,7 @@ MSG_SERVO_ERROR      = 0x03
 MSG_HEARTBEAT_ACK    = 0x04
 MSG_HELLO            = 0x05
 MSG_WALL_RANGE       = 0x06
+MSG_APPROACH_TARGET  = 0x07
 
 MSG_HEARTBEAT        = 0x81    # STM32 -> K230
 MSG_MODE_CMD         = 0x82
@@ -58,6 +59,7 @@ MSG_NAMES = {
     MSG_HEARTBEAT_ACK: "HEARTBEAT_ACK",
     MSG_HELLO: "HELLO",
     MSG_WALL_RANGE: "WALL_RANGE",
+    MSG_APPROACH_TARGET: "APPROACH_TARGET",
     MSG_HEARTBEAT: "HEARTBEAT",
     MSG_MODE_CMD: "MODE_CMD",
     MSG_STATE_INFO: "STATE_INFO",
@@ -168,6 +170,13 @@ def make_hello(fw_major: int, fw_minor: int, boot_count: int) -> bytes:
 def make_wall_range(front_mm, left_mm, right_mm, valid_mask) -> bytes:
     buf = struct.pack("<BhhhB", MSG_WALL_RANGE, int(front_mm), int(left_mm),
                       int(right_mm), int(valid_mask))
+    return encode(buf)
+
+
+def make_approach_target(err_pm: int, size_pm: int, conf: int,
+                         valid: int) -> bytes:
+    buf = struct.pack("<BhhBB", MSG_APPROACH_TARGET, int(err_pm),
+                      int(size_pm), int(conf), int(valid))
     return encode(buf)
 
 
@@ -313,6 +322,17 @@ def parse_servo_error(payload: bytes):
     return {"err_mm": err, "valid": bool(valid)}
 
 
+def parse_approach_target(payload: bytes):
+    (msg_id, err_pm, size_pm, conf,
+     valid) = struct.unpack_from("<BhhBB", payload, 0)
+    return {
+        "err_pm": err_pm,
+        "size_pm": size_pm,
+        "conf": conf,
+        "valid": bool(valid),
+    }
+
+
 def describe(msg_id: int, payload: bytes) -> str:
     """把消息渲染成可读字符串（用于日志）。"""
     name = MSG_NAMES.get(msg_id, f"UNKNOWN(0x{msg_id:02X})")
@@ -341,6 +361,11 @@ def describe(msg_id: int, payload: bytes) -> str:
         if msg_id == MSG_WALL_RANGE:
             f, l, r, m = struct.unpack_from("<hhhB", payload, 1)
             return f"{name}: front={f} left={l} right={r} mask=0b{m:03b}"
+        if msg_id == MSG_APPROACH_TARGET:
+            d = parse_approach_target(payload)
+            return (f"{name}: err={d['err_pm']}pm "
+                    f"size={d['size_pm']}pm conf={d['conf']} "
+                    f"valid={d['valid']}")
         if msg_id == MSG_MODE_CMD:
             mode = struct.unpack_from("<B", payload, 1)[0]
             return f"{name}: mode={mode}"
@@ -382,6 +407,7 @@ def selftest():
         ("HEARTBEAT_ACK", make_heartbeat_ack(42)),
         ("HELLO", make_hello(1, 2, 7)),
         ("WALL_RANGE", make_wall_range(412, -1, 680, 0b101)),
+        ("APPROACH_TARGET", make_approach_target(-125, 430, 88, 1)),
         ("HEARTBEAT", make_heartbeat(99)),
         ("MODE_CMD", make_mode_cmd(MODE_SERVO)),
         ("STATE_INFO", make_state_info(2, 800, 120, -350, 0)),

@@ -10,6 +10,10 @@ desktop.ini
 # site/ 由 tools/build_site.py 生成，CI 会重建，不入库
 site/
 
+# ---- 固件发布产物 ----
+# dist/ 由 firmware/stm32/wulong_fw/build_release.bat 生成，走 GitHub Release 分发，不入库
+dist/
+
 # ---- 编辑器 ----
 .vscode/*
 !.vscode/settings.json
