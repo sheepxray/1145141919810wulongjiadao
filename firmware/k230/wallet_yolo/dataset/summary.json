@@ -1,0 +1,90 @@
+{
+  "source_archive": "C:\\Users\\sheep\\Downloads\\project-1-at-2026-10-23-23-42-9e46ba4d.zip",
+  "source_images": "C:\\Users\\sheep\\Desktop\\data1123",
+  "label_format": "YOLO segmentation polygons converted to detection boxes",
+  "class_name": "钱包",
+  "class_id": 0,
+  "image_count": 16,
+  "split_counts": {
+    "train": 13,
+    "val": 3,
+    "total": 16
+  },
+  "packed_image_count": 0,
+  "zip_images_directory_empty": true,
+  "image_dimensions": {
+    "微信图片_20261023231627_456_9.jpg": [
+      3072,
+      4096
+    ],
+    "微信图片_20261023231645_458_9.jpg": [
+      4096,
+      3072
+    ],
+    "微信图片_20261023231605_454_9.jpg": [
+      3072,
+      4096
+    ],
+    "微信图片_20261023231614_455_9.jpg": [
+      3072,
+      4096
+    ],
+    "微信图片_20261023231728_463_9.jpg": [
+      3072,
+      4096
+    ],
+    "微信图片_20261023231654_459_9.jpg": [
+      3072,
+      4096
+    ],
+    "微信图片_20261023231710_461_9.jpg": [
+      3072,
+      4096
+    ],
+    "微信图片_20261023231637_457_9.jpg": [
+      4096,
+      3072
+    ],
+    "微信图片_20261023231542_450_9.jpg": [
+      4096,
+      3072
+    ],
+    "微信图片_20261023231549_451_9.jpg": [
+      4096,
+      3072
+    ],
+    "微信图片_20261023231718_462_9.jpg": [
+      4096,
+      3072
+    ],
+    "微信图片_20261023231739_464_9.jpg": [
+      3072,
+      4096
+    ],
+    "微信图片_20261023231600_453_9.jpg": [
+      3072,
+      4096
+    ],
+    "微信图片_20261023231702_460_9.jpg": [
+      3072,
+      4096
+    ],
+    "微信图片_20261023231536_449_9.jpg": [
+      4096,
+      3072
+    ],
+    "微信图片_20261023231554_452_9.jpg": [
+      3072,
+      4096
+    ]
+  },
+  "box_size_stats_normalized": {
+    "average_width": 0.547018,
+    "average_height": 0.542265,
+    "min_width": 0.252611,
+    "min_height": 0.246736
+  },
+  "empty_label_files": [],
+  "dataset_yaml": "C:\\Users\\sheep\\Desktop\\乌龙驾到\\outputs\\wallet_yolo_k230\\dataset\\wallet.yaml",
+  "classes_file": "C:\\Users\\sheep\\Desktop\\乌龙驾到\\outputs\\wallet_yolo_k230\\dataset\\classes.txt"
+}

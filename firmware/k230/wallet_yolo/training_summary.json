@@ -1,0 +1,32 @@
+{
+  "model": "yolov8n.pt",
+  "train_image_size": 640,
+  "export_image_size": 480,
+  "batch_size": 8,
+  "train_images": 13,
+  "val_images": 3,
+  "auto_epoch_budget": 300,
+  "actual_epochs": 208,
+  "best_epoch": 148,
+  "augmentation": {
+    "mosaic": 0.0,
+    "mixup": 0.0,
+    "copy_paste": 0.0,
+    "degrees": 0.0,
+    "translate": 0.05,
+    "scale": 0.3,
+    "fliplr": 0.5
+  },
+  "early_stop_patience": 60,
+  "max_epochs": 300,
+  "target_optimizer_steps": 1200,
+  "checkpoint_pt": "C:\\Users\\sheep\\Desktop\\乌龙驾到\\outputs\\wallet_yolo_k230\\checkpoints\\wallet_yolov8n_480.pt",
+  "onnx": "C:\\Users\\sheep\\Desktop\\乌龙驾到\\outputs\\wallet_yolo_k230\\checkpoints\\wallet_yolov8n_480.onnx",
+  "run_dir": "C:\\Users\\sheep\\Desktop\\乌龙驾到\\outputs\\wallet_yolo_k230\\runs\\wallet_yolov8n_640_simple",
+  "validation": {
+    "metrics/mAP50-95(B)": 0.64,
+    "metrics/mAP50(B)": 0.913,
+    "metrics/precision(B)": 0.734,
+    "metrics/recall(B)": 0.935
+  }
+}

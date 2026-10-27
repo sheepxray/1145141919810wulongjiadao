@@ -1,0 +1,5 @@
+path: C:/Users/sheep/Desktop/乌龙驾到/outputs/wallet_yolo_k230/dataset
+train: images/train
+val: images/val
+names:
+  0: 钱包

@@ -155,3 +155,18 @@ gh release create v1.1.0 \
 ```
 
 > 给已存在的 Release 追加模型：`gh release upload <tag> hardware/mechanical/sketchup/底盘_一体_v11.skp`
+
+---
+
+## 8. 发布资产：K230 训练资产
+
+K230D 钱包 YOLOv8n 的**脚本已入库**（`firmware/k230/wallet_yolo/`）；**数据集与模型体积大，走 Release 资产**，不入库。
+
+| 资产 | 说明 |
+|---|---|
+| `k230_wallet_models.zip` | 训练产物：`wallet_yolov8n_{320,480}` 的 `.pt` / `.onnx` / `.simplified.onnx` / `.kmodel` |
+| `k230_wallet_dataset.zip` | 训练集：`dataset/images`（train/val 原图）+ `dataset/labels`（YOLO 单类「钱包」标签） |
+
+```sh
+gh release upload <tag> k230_wallet_models.zip k230_wallet_dataset.zip
+```

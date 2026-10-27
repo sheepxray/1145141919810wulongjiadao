@@ -1,0 +1,41 @@
+{
+  "onnx_path": "C:\\Users\\sheep\\Desktop\\乌龙驾到\\outputs\\wallet_yolo_k230\\checkpoints\\wallet_yolov8n_480.onnx",
+  "simplified_onnx": "C:\\Users\\sheep\\Desktop\\乌龙驾到\\outputs\\wallet_yolo_k230\\checkpoints\\wallet_yolov8n_480.simplified.onnx",
+  "kmodel_path": "C:\\Users\\sheep\\Desktop\\乌龙驾到\\outputs\\wallet_yolo_k230\\checkpoints\\wallet_yolov8n_480.kmodel",
+  "onnx_version": "1.23.2",
+  "nncase_version": "2.11.0",
+  "target": "k230",
+  "image_size": 480,
+  "calibration_images": 16,
+  "preprocess": {
+    "input_type": "uint8",
+    "input_range": [
+      0,
+      1
+    ],
+    "mean": [
+      0,
+      0,
+      0
+    ],
+    "std": [
+      1,
+      1,
+      1
+    ]
+  },
+  "onnx_validation": {
+    "images": 3,
+    "metrics/precision(B)": 0.734,
+    "metrics/recall(B)": 0.935,
+    "metrics/mAP50(B)": 0.913,
+    "metrics/mAP50-95(B)": 0.64
+  },
+  "kmodel_size_bytes": 3495392,
+  "verification": {
+    "file_magic": "LDMK",
+    "kmodel_size_bytes": 3495392,
+    "status": "kmodel_file_ok_simulator_unavailable",
+    "simulator_error": "RuntimeError('The specified module could not be found.')"
+  }
+}
