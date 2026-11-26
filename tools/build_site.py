@@ -157,31 +157,35 @@ FIRMWARE_INFO = [
 
 # 关键指标（首页展示）
 KEY_METRICS = [
-    ("总质量", "1134", "g", "上限 1500 g"),
-    ("总成本", "1486", "元", "预算 2000 元"),
-    ("外廓", "223×195×160", "mm", "上限 250×200×180"),
-    ("视觉帧率", "1080p@30", "", "SEARCH 58 / SERVO 244 FPS"),
-    ("推入段延迟", "40.4", "ms", "位置滞后 10 mm"),
-    ("贴墙容错", "40.0", "mm", "推板悬伸 22.5mm/侧"),
+    ("实际采购", "1012.50", "元", "票据逐笔口径 · 预算 2000 元"),
+    ("总质量", "待称重", "", "电机已占 680 g / 上限 1500 g"),
+    ("底盘构型", "麦轮全向", "", "60mm ×4 + MG513X 1:28"),
+    ("速度环稳态误差", "<1", "%", "四轮 100/150/200 mm/s 实测"),
+    ("航向回正误差", "0.37", "°", "K3 落地三轮最优值"),
+    ("额定车速", "0.94", "m/s", "目标 0.8 m/s · PWM 限速"),
 ]
 
 # 五轮迭代（首页展示）
 ITERATIONS = [
-    ("第 1 轮", "06", "电源与电流",
-     "真正的风险是电机烧毁（堵转 86 秒），解法是限流而不是换大电池",
-     "新增 INA240 电流采样 ×2"),
-    ("第 2 轮", "13", "主控与算力",
-     "瓶颈在视觉平台的 CPU（非 NPU）；G431 跑控制环只占 2%",
-     "RK3588 + STM32H723"),
-    ("第 3 轮", "14", "1080p 视觉",
-     "关键是把降采样交给 RGA 硬件（CPU 降采样会让帧率掉到 28 FPS）",
-     "IMX219（1080p@60）"),
-    ("第 4 轮", "15", "字符识别",
-     "识别输出概率分布，优先级须用期望值而非 argmax",
-     "期望值 + 不确定性惩罚"),
-    ("第 5 轮", "16", "建模与 BOM",
-     "相机立柱使总高从 99.5 修正为 160mm（原模型漏算 50mm）",
-     "参数化 SketchUp 模型"),
+    ("W1", "01", "平台裁决",
+     "原五轮方案（差速 + RK3588 + 双 IMX219 + H723）与实际下单存在平台级分叉，"
+     "最终裁决采纳实际 kit：麦轮 + K230D + 单 OV5640 + G474 + TB6612",
+     "平台架构定版"),
+    ("W2", "17", "电机参数核对",
+     "手册四参数自相矛盾 2.2 倍，需万用表量绕组电阻定论；"
+     "TB6612「必须换掉」的旧结论因此作废",
+     "drive_check.py · motor_consistency.py"),
+    ("W3", "fw", "底盘 bring-up",
+     "四轮速度环调通（<1%）、编码器方向修正、IMU 上电校准、"
+     "K3 自转 + 回位在落地复现",
+     "固件 v1.1.0 + 测试记录"),
+    ("W4", "k230", "K230 链路与模型",
+     "UART3 921600 联通 30 帧；nncase 2.11 转 kmodel 跑通端到端",
+     "vision_approach.py · wallet_yolo"),
+    ("W5", "16", "成本与票据核对",
+     "票据逐笔相加实为 ¥1012.50，旧口径 ¥751.01 只统计了首批 13 单；"
+     "两份票据表的手工合计本身也算错",
+     "docs/08 · 16 · 18 重写"),
 ]
 
 # 反直觉发现（首页展示）
@@ -197,10 +201,10 @@ INSIGHTS = [
     ("挡板测距公式不能无条件使用",
      "d = H·f/Δy 只在相机水平时精确；俯角 30°、相机高 250mm 时误差 17.3%。",
      "geometry.py"),
-    ("1080p@30 的瓶颈是 CPU 不是 NPU",
-     "K230 的 NPU 有 6 TOPS 却跑不动，因为图像预处理在 CPU 侧"
-     "（800 vs 20000 MOPS）。",
-     "compute_budget.py"),
+    ("麦轮横移会打滑，闭环比开环可靠",
+     "60mm 麦轮的辊子受力变形，vy 方向实测打滑明显。"
+     "短距离闭环回位可用，但长距离纯横移不可依赖 —— 主路径仍限制在 vx + ω。",
+     "K3 落地复现 · 标定手册 §4"),
     ("换更大的电池解决不了电流问题",
      "堵转电流会让电机发热，只能用限流解决 —— 但实际电机发热比假设小 5 倍。",
      "power_budget.py"),
@@ -593,24 +597,52 @@ def build_home():
 <div class="hero">
   <h1>智能车光电象棋对抗</h1>
   <p class="sub">
-    第十五届全国大学生光电设计竞赛 · 赛题 1 的完整设计方案。
-    一台差速驱动智能车，用双相机做 1080p@30 视觉识别，自主完成
-    「搜索 → 识别 → 计算优先级 → 推入球门」全流程。
+    第十五届全国大学生光电设计竞赛 · 赛题 1 的完整工程记录。
+    一台 <strong>麦轮全向</strong>智能车，用 <strong>K230D + 单 OV5640</strong> 做视觉识别，
+    自主完成「搜索 → 识别 → 计算优先级 → 推入球门」全流程。
+    目标节点：<strong>2027 年 3 月校赛</strong>。
   </p>
   <div class="tags">
     <span>只有 3D 打印</span>
-    <span>预算 ≤ ¥2000</span>
-    <span>3 个月工期</span>
-    <span>1080p@30 视觉</span>
-    <span>五轮迭代</span>
+    <span>预算 ≤ ¥2000（已用 ¥1012.50）</span>
+    <span>麦轮全向 + MG513X</span>
+    <span>K230D + STM32G474</span>
+    <span>单相机</span>
   </div>
 </div>
 
 <h2>最终指标</h2>
 <div class="metrics">{m}</div>
 
+<h2>当前进度</h2>
+<p>
+  按<strong>实机验证证据</strong>判定，不按计划表判定。内部八周 MVP 周期
+  （2026-09-28 → 11-22）已到期，对外按 <strong>2027 年 3 月校赛</strong>倒排。
+</p>
+<div class="insights">
+  <div class="insight">
+    <h4 style="color:var(--ac2)">✅ 已完成（有实测数据）</h4>
+    <p>
+      四轮速度环稳态误差 &lt;1% · IMU ICM-20602 零偏校准与 &plusmn;500 dps 量程 ·
+      K3 自转回位落地复现（航向 &le;0.37&deg;、位置 &le;2.4mm）·
+      K230 UART3 链路 30 帧 · 固件 v1.1.0 已发布
+    </p>
+    <div class="src">来源：firmware/stm32/wulong_fw/docs/测试记录_20261020</div>
+  </div>
+  <div class="insight">
+    <h4 style="color:var(--er)">🔴 未开始 / 空壳</h4>
+    <p>
+      <code>StrategyTask()</code> 仍是空壳（一行未实现）· 降级策略 B 零代码 ·
+      象棋识别（红/黑 + 7 兵种）零代码 · 半对角线力臂仍是
+      <code>100.0f /* TODO: calibrate */</code> · 整车从未称重 ·
+      激光模组（赛题强制）仍未购
+    </p>
+    <div class="src">来源：main.c:3552 · wulong_control.h:45</div>
+  </div>
+</div>
+
 <h2>五轮迭代</h2>
-<p>每轮都产出一个可运行的校核脚本，并已提交到仓库。</p>
+<p>原五轮迭代已完成平台裁决，实际执行落在五个工作包（W1–W5）上。</p>
 <div class="iters">{it}</div>
 
 <h2>反直觉的发现</h2>
@@ -619,8 +651,8 @@ def build_home():
 
 <h2>待确认事项</h2>
 <p>
-  以下规则模糊点会改变整个策略或硬件选型。
-  <strong>标红的三条必须在采购前书面向组委会确认。</strong>
+  以下规则模糊点会改变整个目标函数与策略设计。
+  <strong>标红的三条必须书面向组委会确认 —— 目前尚无任何问询记录。</strong>
 </p>
 <div class="qlist">{qs}</div>
 
@@ -635,18 +667,17 @@ def build_home():
 </table>
 
 <h2>快速开始</h2>
-<pre><code># 校核尺寸与质量（采购前必做）
-python tools/sketchup_model.py
-python tools/mass_budget.py
+<pre><code># 构建并校验站点（当前权威）
+python tools/build_site.py
+python tools/build_site.py --check
+python tools/audit_docs.py
 
-# 生成 SketchUp 建模脚本
-#   → SketchUp 2026：窗口 → Ruby 控制台 → 粘贴 build_robot.rb
+# 驱动与电机校核（当前权威）
+python tools/drive_check.py        # 四轮电流/发热/质量预算
+python tools/motor_consistency.py  # 手册四参数自洽性检验
 
-# 五轮迭代的校核工具
-python tools/power_budget.py       # 第1轮 电流/堵转热分析
-python tools/compute_budget.py     # 第2轮 主控算力
-python tools/vision_pipeline.py    # 第3轮 1080p 管线
-python tools/piece_value.py        # 第4轮 字符识别优先级
+# 底盘标定（下一步必做）
+#   见 firmware/stm32/wulong_fw/docs/底盘标定手册.md
 </code></pre>
 
 <p style="margin-top:28px">
@@ -824,6 +855,57 @@ def build(check_only=False):
     return rendered, missing
 
 
+def _is_repo_source_link(html_file, href):
+    """
+    判断某个链接虽然不在 site/ 里，但**指向仓库内真实存在的源码路径**。
+
+    ★ 为什么需要这个白名单：
+    文档会正常引用仓库里的源码/资料目录，例如
+        docs/03 -> ../firmware/stm32/wulong_fw/
+        hardware/electrical/接口定义.md -> ../../firmware/stm32/docs/xxx.md
+        hardware/electrical/接口定义.md -> D24A_STM32G474_接线标注.png
+    这些链接在 **GitHub 上点开是有效的**（仓库浏览），只是不会被构建进
+    site/。旧版 check_links() 只认 site/ 下的 .html 文件名，于是把它们
+    一律判成坏链并返回非 0 —— 而 build 步骤也是这个返回码，
+    导致 GitHub Actions 的 "Build site" 步骤**必然失败**、Pages 长期不更新。
+
+    所以这里改为：按该 HTML 页面对应的**源文件位置**解析相对路径，
+    只要落到仓库内且实际存在，就视为有效。
+    """
+    # 该页面对应的源文件（相对仓库根）
+    src_rel = PAGES_EXTRA.get(html_file[:-5])
+    if src_rel is None:
+        doc_rel = PAGES.get(html_file[:-5])
+        if doc_rel is None:
+            return False
+        src_rel = os.path.join("docs", doc_rel)
+
+    # 源文件在仓库里的目录，相对路径从它出发解析
+    src_dir_rel = os.path.dirname(src_rel.replace("/", os.sep))
+
+    # 去掉查询串/锚点，只留路径
+    target = href.split("#")[0].split("?")[0]
+    if not target:
+        return False
+
+    # URL 解码（中文文件名/百分号编码）
+    try:
+        from urllib.parse import unquote
+        target = unquote(target)
+    except Exception:
+        pass
+
+    resolved = os.path.normpath(os.path.join(ROOT, src_dir_rel, target))
+    # 必须仍在仓库内，且真实存在
+    try:
+        if os.path.commonpath([os.path.abspath(resolved),
+                               os.path.abspath(ROOT)]) != os.path.abspath(ROOT):
+            return False
+    except ValueError:
+        return False
+    return os.path.exists(resolved)
+
+
 def check_links():
     """检查站内链接完整性。site/ 不存在时返回错误码（不静默通过）"""
     if not os.path.exists(SITE):
@@ -840,6 +922,7 @@ def check_links():
         return 1
 
     problems = []
+    source_links = 0
     for f in sorted(pages):
         txt = io.open(os.path.join(SITE, f), encoding="utf-8").read()
         for m in re.finditer(r'href="([^"]+)"', txt):
@@ -847,10 +930,17 @@ def check_links():
             if h.startswith(("http://", "https://", "#", "mailto:")):
                 continue
             target = h.split("#")[0]
-            if target and target not in pages:
-                problems.append((f, h))
+            if not target or target in pages:
+                continue
+            # 指向仓库源码（GitHub 上有效）的链接不算坏链
+            if _is_repo_source_link(f, h):
+                source_links += 1
+                continue
+            problems.append((f, h))
 
     print(f"\n链接检查：{len(pages)} 个页面")
+    if source_links:
+        print(f"  （另有 {source_links} 处指向仓库源码目录，GitHub 上有效，已放行）")
     if problems:
         print(f"  发现 {len(problems)} 处问题：")
         for f, h in problems[:20]:
